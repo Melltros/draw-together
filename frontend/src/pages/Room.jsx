@@ -375,7 +375,7 @@ export const Room = () => {
       </header>
 
       {/* 2. MAIN DASHBOARD CONTENT AREA */}
-      <div className="flex-1 flex overflow-hidden min-h-0 relative p-4 gap-4">
+      <div className="flex-1 flex overflow-hidden min-h-0 relative p-1.5 md:p-4 gap-2 md:gap-4">
         {/* LEFT WORKSPACE BAR (Drawing tools floating sidebar) */}
         <div 
           className={`flex-col shrink-0 gap-3 z-30 select-none absolute md:relative top-16 md:top-0 left-4 md:left-0 transition-all duration-300 ${
@@ -393,7 +393,7 @@ export const Room = () => {
         </div>
 
         {/* MIDDLE WORKSPACE (Main painting canvas overlay) */}
-        <div className="flex-1 h-full min-w-0 relative flex flex-col gap-4">
+        <div className="flex-1 h-full min-w-0 relative flex flex-col gap-2 md:gap-4">
           <Canvas
             strokes={strokes}
             setStrokes={setStrokes}
