@@ -85,8 +85,8 @@ export const Home = () => {
         <div className={`transition-all duration-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
           <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-blue-500/10 border border-purple-500/20 mb-8">
             <Stars size={14} className="text-purple-400 animate-pulse" />
-            <span className="text-xs font-semibold text-purple-300 tracking-wide">Collaborative Art Studio</span>
-            <span className="text-[10px] font-bold bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full">v2.0</span>
+            <span className="text-xs font-semibold text-purple-300 tracking-wide">Built by Melltros</span>
+            <span className="text-[10px] font-bold bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full">✦</span>
           </div>
         </div>
 
