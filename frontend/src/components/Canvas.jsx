@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { MousePointer, Check, X, RotateCcw } from 'lucide-react';
+import { MousePointer, Check, X, Move } from 'lucide-react';
 
 export const Canvas = ({
   strokes,
@@ -28,6 +28,10 @@ export const Canvas = ({
 
   // Interactive Text / Sticker Placement State
   const [activePlacement, setActivePlacement] = useState(null); // { canvasX, canvasY, text, type: 'text'|'sticker', size, color }
+
+  // Dragging placement state
+  const [isDraggingPlacement, setIsDraggingPlacement] = useState(false);
+  const dragStartRef = useRef({ x: 0, y: 0, placementX: 0, placementY: 0 });
 
   // Fixed internal backing store dimensions (Square 1600x1600 gives mobile 2.5x more vertical space!)
   const CANVAS_WIDTH = 1600;
@@ -159,10 +163,10 @@ export const Canvas = ({
   useEffect(() => {
     const checkStickerChange = setInterval(() => {
       if (window.selectedEmoji) {
-        // Find center of canvas or set active placement
+        // Place sticker at center of canvas initially
         setActivePlacement({
-          canvasX: CANVAS_WIDTH / 2 - 40,
-          canvasY: CANVAS_HEIGHT / 2 - 40,
+          canvasX: CANVAS_WIDTH / 2,
+          canvasY: CANVAS_HEIGHT / 2,
           text: window.selectedEmoji,
           type: 'sticker',
           size: 80,
@@ -316,7 +320,68 @@ export const Canvas = ({
     setCurrentPoints([]);
   };
 
-  // Commits the active text or sticker onto the canvas
+  // Dragging handling for placement
+  const handleDragStart = (e) => {
+    e.stopPropagation();
+    const hasTouches = e.touches && e.touches.length > 0;
+    const clientX = hasTouches ? e.touches[0].clientX : e.clientX;
+    const clientY = hasTouches ? e.touches[0].clientY : e.clientY;
+
+    dragStartRef.current = {
+      x: clientX,
+      y: clientY,
+      placementX: activePlacement.canvasX,
+      placementY: activePlacement.canvasY
+    };
+    setIsDraggingPlacement(true);
+  };
+
+  useEffect(() => {
+    if (!isDraggingPlacement) return;
+
+    const handleDragMove = (e) => {
+      const hasTouches = e.touches && e.touches.length > 0;
+      const clientX = hasTouches ? e.touches[0].clientX : e.clientX;
+      const clientY = hasTouches ? e.touches[0].clientY : e.clientY;
+
+      const dx = clientX - dragStartRef.current.x;
+      const dy = clientY - dragStartRef.current.y;
+
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+
+      // Convert screen delta to canvas delta
+      const canvasDx = dx * (CANVAS_WIDTH / rect.width);
+      const canvasDy = dy * (CANVAS_HEIGHT / rect.height);
+
+      setActivePlacement((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          canvasX: dragStartRef.current.placementX + canvasDx,
+          canvasY: dragStartRef.current.placementY + canvasDy
+        };
+      });
+    };
+
+    const handleDragEnd = () => {
+      setIsDraggingPlacement(false);
+    };
+
+    window.addEventListener('mousemove', handleDragMove);
+    window.addEventListener('mouseup', handleDragEnd);
+    window.addEventListener('touchmove', handleDragMove, { passive: true });
+    window.addEventListener('touchend', handleDragEnd);
+
+    return () => {
+      window.removeEventListener('mousemove', handleDragMove);
+      window.removeEventListener('mouseup', handleDragEnd);
+      window.removeEventListener('touchmove', handleDragMove);
+      window.removeEventListener('touchend', handleDragEnd);
+    };
+  }, [isDraggingPlacement]);
+
   const handlePlacementSubmit = () => {
     if (activePlacement && activePlacement.text.trim()) {
       const isSticker = activePlacement.type === 'sticker';
@@ -348,133 +413,133 @@ export const Canvas = ({
     setActivePlacement(null);
   };
 
-  // Helper to convert internal canvas coords to css percent
-  const getPercentCoords = (canvasX, canvasY) => {
-    return {
-      x: (canvasX / CANVAS_WIDTH) * 100,
-      y: (canvasY / CANVAS_HEIGHT) * 100
-    };
-  };
-
-  const activePct = activePlacement ? getPercentCoords(activePlacement.canvasX, activePlacement.canvasY) : null;
-
   return (
-    <div ref={containerRef} className="relative flex-1 h-full w-full bg-[#0D0D12] overflow-hidden rounded-2xl border border-dark-border/40">
-      <canvas
-        ref={canvasRef}
-        width={CANVAS_WIDTH}
-        height={CANVAS_HEIGHT}
-        onMouseDown={handleStart}
-        onMouseMove={handleMove}
-        onMouseUp={handleEnd}
-        onMouseLeave={handleEnd}
-        onTouchStart={handleStart}
-        onTouchMove={handleMove}
-        onTouchEnd={handleEnd}
-        className="canvas-grid-bg w-full h-full cursor-crosshair max-w-full max-h-full block rounded-2xl"
-      />
+    <div ref={containerRef} className="relative flex-1 h-full w-full bg-[#0D0D12] overflow-hidden rounded-2xl border border-dark-border/40 flex items-center justify-center min-h-0 min-w-0">
+      {/* Wrapper to maintain square aspect ratio and encapsulate overlays perfectly relative to canvas element */}
+      <div className="relative aspect-square max-w-full max-h-full">
+        <canvas
+          ref={canvasRef}
+          width={CANVAS_WIDTH}
+          height={CANVAS_HEIGHT}
+          onMouseDown={handleStart}
+          onMouseMove={handleMove}
+          onMouseUp={handleEnd}
+          onMouseLeave={handleEnd}
+          onTouchStart={handleStart}
+          onTouchMove={handleMove}
+          onTouchEnd={handleEnd}
+          className="canvas-grid-bg w-full h-full cursor-crosshair block rounded-2xl shadow-2xl"
+        />
 
-      {/* Interactive Text & Sticker Editor Overlay */}
-      {activePlacement && activePct && (
-        <div
-          className="absolute z-40 bg-dark-sidebar/95 border border-purple-500/40 rounded-2xl p-3 shadow-2xl flex flex-col gap-2 min-w-[220px]"
-          style={{
-            left: `${activePct.x}%`,
-            top: `${activePct.y}%`,
-            transform: 'translate(-50%, -100%)',
-            marginTop: '-15px'
-          }}
-        >
-          <div className="flex items-center justify-between gap-2 border-b border-dark-border/40 pb-1.5">
-            <span className="text-[10px] font-bold text-purple-400 uppercase tracking-widest">
-              Editing {activePlacement.type}
-            </span>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={handlePlacementSubmit}
-                className="w-5 h-5 rounded bg-emerald-500/20 text-emerald-400 flex items-center justify-center hover:bg-emerald-500/30 transition-all"
-              >
-                <Check size={12} />
-              </button>
-              <button
-                onClick={() => setActivePlacement(null)}
-                className="w-5 h-5 rounded bg-rose-500/20 text-rose-400 flex items-center justify-center hover:bg-rose-500/30 transition-all"
-              >
-                <X size={12} />
-              </button>
-            </div>
-          </div>
-
-          {activePlacement.type === 'text' ? (
-            <input
-              type="text"
-              autoFocus
-              value={activePlacement.text}
-              onChange={(e) => setActivePlacement({ ...activePlacement, text: e.target.value })}
-              placeholder="Enter text..."
-              className="bg-dark-card border border-dark-border/50 rounded-xl px-2.5 py-1.5 text-xs text-white outline-none focus:border-purple-500/60"
-            />
-          ) : (
-            <div className="text-center py-1">
-              <span style={{ fontSize: `${activePlacement.size * 0.75}px` }}>
-                {activePlacement.text}
-              </span>
-            </div>
-          )}
-
-          {/* Real-time Resizer Slider */}
-          <div className="flex flex-col gap-1 mt-1">
-            <div className="flex items-center justify-between text-[9px] font-bold text-gray-500">
-              <span>Size</span>
-              <span>{activePlacement.size}px</span>
-            </div>
-            <input
-              type="range"
-              min="16"
-              max="160"
-              value={activePlacement.size}
-              onChange={(e) => setActivePlacement({ ...activePlacement, size: parseInt(e.target.value) })}
-              className="w-full"
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Render Active Other Painter Cursors */}
-      {Object.entries(cursors).map(([cUserId, cursor]) => {
-        const canvas = canvasRef.current;
-        if (!canvas) return null;
-        if (cUserId === userId) return null;
-
-        const pctX = (cursor.x / CANVAS_WIDTH) * 100;
-        const pctY = (cursor.y / CANVAS_HEIGHT) * 100;
-
-        return (
+        {/* Interactive Resizable & Draggable Overlay */}
+        {activePlacement && (
           <div
-            key={cUserId}
-            className="floating-cursor-label absolute pointer-events-none transition-all duration-75 flex flex-col items-start gap-1"
+            className="absolute z-40 bg-dark-sidebar/95 border border-purple-500/40 rounded-2xl p-3.5 shadow-2xl flex flex-col gap-2.5 min-w-[220px]"
             style={{
-              left: `${pctX}%`,
-              top: `${pctY}%`
+              left: `${(activePlacement.canvasX / CANVAS_WIDTH) * 100}%`,
+              top: `${(activePlacement.canvasY / CANVAS_HEIGHT) * 100}%`,
+              transform: 'translate(-50%, -50%)',
             }}
           >
-            <MousePointer
-              size={18}
-              style={{
-                color: cursor.color,
-                fill: cursor.color
-              }}
-              className="drop-shadow-lg transform -rotate-90 -translate-x-1 -translate-y-1"
-            />
-            <span
-              style={{ backgroundColor: cursor.color }}
-              className="text-[9px] font-bold text-dark-bg px-2 py-0.5 rounded-full shadow-md whitespace-nowrap -translate-x-2 -translate-y-1 opacity-90 border border-black/10"
+            {/* Header / Drag Bar */}
+            <div
+              onMouseDown={handleDragStart}
+              onTouchStart={handleDragStart}
+              className="flex items-center justify-between gap-3 border-b border-dark-border/40 pb-2 cursor-move select-none"
             >
-              {cursor.username}
-            </span>
+              <div className="flex items-center gap-1.5 text-[9px] font-extrabold text-purple-400 uppercase tracking-widest">
+                <Move size={11} />
+                <span>Drag to Position</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={handlePlacementSubmit}
+                  className="w-5.5 h-5.5 rounded bg-emerald-500/25 text-emerald-400 flex items-center justify-center hover:bg-emerald-500/40 transition-all cursor-pointer"
+                >
+                  <Check size={13} />
+                </button>
+                <button
+                  onClick={() => setActivePlacement(null)}
+                  className="w-5.5 h-5.5 rounded bg-rose-500/25 text-rose-400 flex items-center justify-center hover:bg-rose-500/40 transition-all cursor-pointer"
+                >
+                  <X size={13} />
+                </button>
+              </div>
+            </div>
+
+            {/* Content Input or Emoji stamp */}
+            {activePlacement.type === 'text' ? (
+              <input
+                type="text"
+                autoFocus
+                value={activePlacement.text}
+                onChange={(e) => setActivePlacement({ ...activePlacement, text: e.target.value })}
+                placeholder="Type here..."
+                style={{ color: activePlacement.color }}
+                className="bg-dark-card border border-dark-border/50 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-purple-500/60 font-medium"
+              />
+            ) : (
+              <div className="text-center py-2 select-none">
+                <span style={{ fontSize: `${activePlacement.size * 0.5}px` }}>
+                  {activePlacement.text}
+                </span>
+              </div>
+            )}
+
+            {/* Size Resizer Slider */}
+            <div className="flex flex-col gap-1 select-none">
+              <div className="flex items-center justify-between text-[9px] font-bold text-gray-500 uppercase tracking-wider">
+                <span>Scale</span>
+                <span>{activePlacement.size}px</span>
+              </div>
+              <input
+                type="range"
+                min="20"
+                max="180"
+                value={activePlacement.size}
+                onChange={(e) => setActivePlacement({ ...activePlacement, size: parseInt(e.target.value) })}
+                className="w-full cursor-ew-resize"
+              />
+            </div>
           </div>
-        );
-      })}
+        )}
+
+        {/* Render Active Other Painter Cursors */}
+        {Object.entries(cursors).map(([cUserId, cursor]) => {
+          const canvas = canvasRef.current;
+          if (!canvas) return null;
+          if (cUserId === userId) return null;
+
+          const pctX = (cursor.x / CANVAS_WIDTH) * 100;
+          const pctY = (cursor.y / CANVAS_HEIGHT) * 100;
+
+          return (
+            <div
+              key={cUserId}
+              className="floating-cursor-label absolute pointer-events-none transition-all duration-75 flex flex-col items-start gap-1"
+              style={{
+                left: `${pctX}%`,
+                top: `${pctY}%`
+              }}
+            >
+              <MousePointer
+                size={18}
+                style={{
+                  color: cursor.color,
+                  fill: cursor.color
+                }}
+                className="drop-shadow-lg transform -rotate-90 -translate-x-1 -translate-y-1"
+              />
+              <span
+                style={{ backgroundColor: cursor.color }}
+                className="text-[9px] font-bold text-dark-bg px-2 py-0.5 rounded-full shadow-md whitespace-nowrap -translate-x-2 -translate-y-1 opacity-90 border border-black/10"
+              >
+                {cursor.username}
+              </span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };

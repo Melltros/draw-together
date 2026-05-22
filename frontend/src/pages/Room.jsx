@@ -279,7 +279,7 @@ export const Room = () => {
   return (
     <div className="min-h-screen max-h-screen w-screen bg-[#0A0A0D] flex flex-col overflow-hidden relative">
       {/* 1. TOP NAVBAR PANEL */}
-      <header className="h-13 glass-panel border-b border-dark-border/50 px-4 sm:px-5 flex items-center justify-between shrink-0 select-none">
+      <header className="h-14 glass-panel border-b border-dark-border/50 px-4 sm:px-5 flex items-center justify-between shrink-0 select-none">
         {/* Left */}
         <div className="flex items-center gap-2 sm:gap-3">
           <button
