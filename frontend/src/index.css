@@ -227,6 +227,28 @@ input[type="range"]::-webkit-slider-thumb:hover {
   max-height: 100dvh;
   width: 100%;
   overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: manipulation;
+}
+
+/* Room mode: block pull-to-refresh / rubber-band reload on mobile */
+html.room-mode,
+body.room-mode {
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: manipulation;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+/* Drawing surface — never scroll or trigger browser gestures */
+.draw-surface {
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  overscroll-behavior: none;
 }
 
 .sidebar-scroll {

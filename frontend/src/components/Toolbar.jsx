@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pencil, Eraser, Minus, Square, Circle, Type, Smile, ChevronDown, ChevronUp, Info } from 'lucide-react';
+import { Pencil, Eraser, Highlighter, Minus, Square, Circle, Type, Smile, ChevronDown, ChevronUp, Info } from 'lucide-react';
 
 const PRESET_COLORS = [
   '#70000E', '#C3B79D', '#DCD7D4', '#F5F4F2', '#E11D48',
@@ -10,6 +10,7 @@ const EMOJI_STAMPS = ['⭐', '❤️', '🔥', '✨', '💀', '👀', '🎨', '�
 
 const TOOL_HINTS = {
   pen: 'Drag on the canvas to draw freehand lines.',
+  highlighter: 'Semi-transparent strokes — great for marking areas.',
   eraser: 'Drag to erase parts of the drawing.',
   line: 'Click and drag to draw a straight line.',
   rect: 'Click and drag to draw a rectangle.',
@@ -30,6 +31,7 @@ export const Toolbar = ({
 
   const tools = [
     { id: 'pen', icon: Pencil, label: 'Pen' },
+    { id: 'highlighter', icon: Highlighter, label: 'Highlight' },
     { id: 'eraser', icon: Eraser, label: 'Eraser' },
     { id: 'line', icon: Minus, label: 'Line' },
     { id: 'rect', icon: Square, label: 'Box' },
@@ -51,7 +53,7 @@ export const Toolbar = ({
 
       <div className="pinterest-panel rounded-2xl p-3">
         <p className="ux-section-title mb-3 px-0.5">Choose a tool</p>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 sm:grid-cols-3 gap-2">
           {tools.map((tool) => {
             const Icon = tool.icon;
             const isActive = activeTool === tool.id;

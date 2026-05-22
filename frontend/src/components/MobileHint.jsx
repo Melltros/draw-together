@@ -38,7 +38,7 @@ export const MobileHint = () => {
             <span className="w-8 h-8 rounded-lg bg-[#C73543]/20 flex items-center justify-center shrink-0">
               <Pencil size={14} className="text-[#F7C7CB]" />
             </span>
-            <span><strong className="text-white">Canvas</strong> — draw with your finger or mouse</span>
+            <span><strong className="text-white">Canvas</strong> — draw here (page won&apos;t refresh while you draw)</span>
           </li>
           <li className="flex items-center gap-2.5">
             <span className="w-8 h-8 rounded-lg bg-[#C73543]/20 flex items-center justify-center shrink-0">

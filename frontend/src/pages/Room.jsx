@@ -6,6 +6,8 @@ import { Canvas } from '../components/Canvas';
 import { UserList } from '../components/UserList';
 import { Chat } from '../components/Chat';
 import { MobileHint } from '../components/MobileHint';
+import { MobileQuickBar } from '../components/MobileQuickBar';
+import { useRoomBodyLock } from '../hooks/useRoomBodyLock';
 import {
   Undo2,
   Redo2,
@@ -61,8 +63,10 @@ export const Room = () => {
   const [undoStack, setUndoStack] = useState([]);
   const [redoStack, setRedoStack] = useState([]);
 
-  // Copy indicators
   const [copiedLink, setCopiedLink] = useState(false);
+  const [copiedCode, setCopiedCode] = useState(false);
+
+  useRoomBodyLock(roomExistsChecked);
 
   // 1. First: Check if room exists in directory
   useEffect(() => {
@@ -116,6 +120,7 @@ export const Room = () => {
 
   const {
     isConnected,
+    showReconnectNotice,
     userId,
     userColor,
     activeUsers,
@@ -150,13 +155,22 @@ export const Room = () => {
 
   // 4. Board actions
   const handleCopyLink = () => {
-    const shareUrl = window.location.href;
-    navigator.clipboard.writeText(shareUrl)
+    navigator.clipboard.writeText(window.location.href)
       .then(() => {
         setCopiedLink(true);
         setTimeout(() => setCopiedLink(false), 2000);
       })
       .catch((err) => console.error('Failed to copy link:', err));
+  };
+
+  const handleCopyRoomCode = () => {
+    navigator.clipboard.writeText(formattedRoomId)
+      .then(() => {
+        setCopiedCode(true);
+        setTimeout(() => setCopiedCode(false), 2000);
+        if (navigator.vibrate) navigator.vibrate(12);
+      })
+      .catch((err) => console.error('Failed to copy code:', err));
   };
 
   const handleLocalUndo = () => {
@@ -281,6 +295,18 @@ export const Room = () => {
 
   return (
     <div className="app-shell bg-[#2A1B1B] flex flex-col relative">
+      {showReconnectNotice && (
+        <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-emerald-500/90 text-white text-xs font-bold shadow-lg animate-slide-up">
+          Reconnected — you&apos;re back online
+        </div>
+      )}
+
+      {!isConnected && roomExistsChecked && (
+        <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-[#C73543]/95 text-white text-xs font-bold shadow-lg">
+          Connection lost — trying to reconnect…
+        </div>
+      )}
+
       {mobileDrawerOpen && (
         <button
           type="button"
@@ -301,12 +327,18 @@ export const Room = () => {
             <span className="hidden sm:inline">Leave</span>
           </button>
 
-          <div className="min-w-0">
-            <p className="ux-label leading-none mb-0.5">Room code</p>
-            <p className="text-sm sm:text-base font-black tracking-widest text-white truncate">
+          <button
+            type="button"
+            onClick={handleCopyRoomCode}
+            className="min-w-0 text-left rounded-xl hover:bg-dark-card/80 px-2 py-1 -mx-2 active:scale-95 cursor-pointer"
+            title="Tap to copy room code"
+          >
+            <p className="ux-label leading-none mb-0.5">Room code · tap to copy</p>
+            <p className="text-sm sm:text-base font-black tracking-widest text-white truncate flex items-center gap-1.5">
               {formattedRoomId}
+              {copiedCode ? <Check size={12} className="text-emerald-400 shrink-0" /> : <Copy size={12} className="text-gray-500 shrink-0" />}
             </p>
-          </div>
+          </button>
         </div>
 
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
@@ -353,7 +385,7 @@ export const Room = () => {
       </div>
 
       {/* 2. MAIN DASHBOARD CONTENT AREA */}
-      <div className="flex-1 flex overflow-hidden min-h-0 relative p-1.5 md:p-4 gap-2 md:gap-4 pb-[calc(5.25rem+env(safe-area-inset-bottom,0px))] md:pb-4">
+      <div className="flex-1 flex overflow-hidden min-h-0 relative p-1.5 md:p-4 gap-2 md:gap-4 pb-[calc(8.5rem+env(safe-area-inset-bottom,0px))] md:pb-4">
         {/* Desktop: left toolbar */}
         <div className="hidden md:flex flex-col shrink-0 gap-3 select-none">
           <Toolbar
@@ -495,6 +527,16 @@ export const Room = () => {
       )}
 
       <MobileHint />
+
+      <MobileQuickBar
+        activeTool={activeTool}
+        setActiveTool={handleActiveToolChange}
+        color={color}
+        setColor={setColor}
+        brushSize={brushSize}
+        setBrushSize={setBrushSize}
+        visible={!showLeftSidebar && !showRightSidebar}
+      />
 
       {/* Mobile: bottom navigation */}
       <nav

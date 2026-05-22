@@ -1,5 +1,7 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { MousePointer, Check, X, Move } from 'lucide-react';
+
+const STROKE_TOOLS = new Set(['pen', 'eraser', 'highlighter']);
 
 export const Canvas = ({
   strokes,
@@ -31,7 +33,23 @@ export const Canvas = ({
 
   // Dragging placement state
   const [isDraggingPlacement, setIsDraggingPlacement] = useState(false);
+  const [touchPreview, setTouchPreview] = useState(null);
   const dragStartRef = useRef({ x: 0, y: 0, placementX: 0, placementY: 0 });
+  const isDrawingRef = useRef(false);
+  const activeToolRef = useRef(activeTool);
+  const colorRef = useRef(color);
+  const brushSizeRef = useRef(brushSize);
+
+  useEffect(() => {
+    activeToolRef.current = activeTool;
+    colorRef.current = color;
+    brushSizeRef.current = brushSize;
+  }, [activeTool, color, brushSize]);
+
+  useEffect(() => {
+    isDrawingRef.current = isDrawing;
+    window.__paintsyncDrawing = isDrawing;
+  }, [isDrawing]);
 
   // Fixed internal backing store dimensions (Square 1600x1600 gives mobile 2.5x more vertical space!)
   const CANVAS_WIDTH = 1600;
@@ -54,7 +72,11 @@ export const Canvas = ({
       ctx.globalCompositeOperation = 'source-over';
     }
 
-    if (stroke.tool === 'pen' || stroke.tool === 'eraser') {
+    if (STROKE_TOOLS.has(stroke.tool)) {
+      if (stroke.tool === 'highlighter') {
+        ctx.globalAlpha = 0.38;
+        ctx.lineWidth = stroke.size * 1.8;
+      }
       if (stroke.points && stroke.points.length > 0) {
         ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
         for (let i = 1; i < stroke.points.length; i++) {
@@ -62,6 +84,7 @@ export const Canvas = ({
         }
         ctx.stroke();
       }
+      ctx.globalAlpha = 1;
     } else if (stroke.tool === 'line') {
       if (stroke.startPoint && stroke.endPoint) {
         ctx.moveTo(stroke.startPoint.x, stroke.startPoint.y);
@@ -133,16 +156,17 @@ export const Canvas = ({
 
   const getLocalActiveStroke = () => {
     if (!startPoint) return null;
-    
+    const tool = activeToolRef.current;
+
     const baseStroke = {
       userId,
       username,
-      tool: activeTool,
-      color: activeTool === 'eraser' ? '#ffffff' : color,
-      size: brushSize
+      tool,
+      color: tool === 'eraser' ? '#ffffff' : colorRef.current,
+      size: brushSizeRef.current
     };
 
-    if (activeTool === 'pen' || activeTool === 'eraser') {
+    if (STROKE_TOOLS.has(tool)) {
       return { ...baseStroke, points: currentPoints };
     } else {
       const lastPoint = currentPoints[currentPoints.length - 1];
@@ -219,12 +243,16 @@ export const Canvas = ({
     return { x, y };
   };
 
-  // Mouse Down / Touch Start
+  const setDrawingLock = useCallback((locked) => {
+    isDrawingRef.current = locked;
+    window.__paintsyncDrawing = locked;
+  }, []);
+
   const handleStart = (e) => {
     const coords = getCoordinates(e);
     if (!coords) return;
 
-    if (activeTool === 'text') {
+    if (activeToolRef.current === 'text') {
       setActivePlacement({
         canvasX: coords.x,
         canvasY: coords.y,
@@ -237,18 +265,21 @@ export const Canvas = ({
     }
 
     setIsDrawing(true);
+    setDrawingLock(true);
     setStartPoint({ x: coords.x, y: coords.y });
     setCurrentPoints([{ x: coords.x, y: coords.y }]);
+    setTouchPreview({ x: coords.x, y: coords.y });
 
+    const tool = activeToolRef.current;
     const baseStroke = {
       userId,
       username,
-      tool: activeTool,
-      color: activeTool === 'eraser' ? '#ffffff' : color,
-      size: brushSize
+      tool,
+      color: tool === 'eraser' ? '#ffffff' : colorRef.current,
+      size: brushSizeRef.current
     };
-    
-    const activeStroke = activeTool === 'pen' || activeTool === 'eraser' 
+
+    const activeStroke = STROKE_TOOLS.has(tool)
       ? { ...baseStroke, points: [{ x: coords.x, y: coords.y }] }
       : { ...baseStroke, startPoint: { x: coords.x, y: coords.y }, endPoint: { x: coords.x, y: coords.y } };
 
@@ -259,27 +290,29 @@ export const Canvas = ({
     });
   };
 
-  // Mouse Move / Touch Move
   const handleMove = (e) => {
     const coords = getCoordinates(e);
     if (!coords) return;
 
     emitCursorMove(coords.x, coords.y);
+    if (isDrawingRef.current) {
+      setTouchPreview({ x: coords.x, y: coords.y });
+    }
 
-    if (!isDrawing || activeTool === 'text') return;
+    if (!isDrawingRef.current || activeToolRef.current === 'text') return;
 
     setCurrentPoints((prev) => {
       const updated = [...prev, { x: coords.x, y: coords.y }];
-      
+      const tool = activeToolRef.current;
       const baseStroke = {
         userId,
         username,
-        tool: activeTool,
-        color: activeTool === 'eraser' ? '#ffffff' : color,
-        size: brushSize
+        tool,
+        color: tool === 'eraser' ? '#ffffff' : colorRef.current,
+        size: brushSizeRef.current
       };
 
-      const activeStroke = activeTool === 'pen' || activeTool === 'eraser'
+      const activeStroke = STROKE_TOOLS.has(tool)
         ? { ...baseStroke, points: updated }
         : { ...baseStroke, startPoint, endPoint: { x: coords.x, y: coords.y } };
 
@@ -293,10 +326,15 @@ export const Canvas = ({
     });
   };
 
-  // Mouse Up / Touch End
   const handleEnd = () => {
-    if (!isDrawing || activeTool === 'text') return;
+    if (!isDrawingRef.current || activeToolRef.current === 'text') return;
     setIsDrawing(false);
+    setDrawingLock(false);
+    setTouchPreview(null);
+
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate(8);
+    }
 
     const finalStroke = getLocalActiveStroke();
     if (finalStroke) {
@@ -319,6 +357,49 @@ export const Canvas = ({
     setStartPoint(null);
     setCurrentPoints([]);
   };
+
+  const handlersRef = useRef({ handleStart, handleMove, handleEnd });
+  handlersRef.current = { handleStart, handleMove, handleEnd };
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const container = containerRef.current;
+    if (!canvas) return;
+
+    const onTouchStart = (e) => {
+      if (e.cancelable) e.preventDefault();
+      e.stopPropagation();
+      handlersRef.current.handleStart(e);
+    };
+    const onTouchMove = (e) => {
+      if (e.cancelable) e.preventDefault();
+      e.stopPropagation();
+      handlersRef.current.handleMove(e);
+    };
+    const onTouchEnd = (e) => {
+      if (e.cancelable) e.preventDefault();
+      e.stopPropagation();
+      handlersRef.current.handleEnd(e);
+    };
+
+    canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+    canvas.addEventListener('touchmove', onTouchMove, { passive: false });
+    canvas.addEventListener('touchend', onTouchEnd, { passive: false });
+    canvas.addEventListener('touchcancel', onTouchEnd, { passive: false });
+
+    const stopScroll = (e) => {
+      if (isDrawingRef.current && e.cancelable) e.preventDefault();
+    };
+    container?.addEventListener('touchmove', stopScroll, { passive: false });
+
+    return () => {
+      canvas.removeEventListener('touchstart', onTouchStart);
+      canvas.removeEventListener('touchmove', onTouchMove);
+      canvas.removeEventListener('touchend', onTouchEnd);
+      canvas.removeEventListener('touchcancel', onTouchEnd);
+      container?.removeEventListener('touchmove', stopScroll);
+    };
+  }, []);
 
   // Dragging handling for placement
   const handleDragStart = (e) => {
@@ -413,10 +494,16 @@ export const Canvas = ({
     setActivePlacement(null);
   };
 
+  const previewColor =
+    activeTool === 'eraser' ? '#ffffff' : activeTool === 'highlighter' ? `${color}99` : color;
+  const previewSize = Math.min(brushSize * (activeTool === 'highlighter' ? 1.8 : 1), 48);
+
   return (
-    <div ref={containerRef} className="relative flex-1 h-full w-full bg-[#0D0D12] overflow-hidden rounded-2xl border border-dark-border/40 flex items-center justify-center min-h-0 min-w-0">
-      {/* Wrapper to maintain square aspect ratio and encapsulate overlays perfectly relative to canvas element */}
-      <div className="relative aspect-square max-w-full max-h-full">
+    <div
+      ref={containerRef}
+      className="draw-surface relative flex-1 h-full w-full bg-[#0D0D12] overflow-hidden rounded-2xl border border-dark-border/40 flex items-center justify-center min-h-0 min-w-0"
+    >
+      <div className="relative aspect-square max-w-full max-h-full draw-surface">
         <canvas
           ref={canvasRef}
           width={CANVAS_WIDTH}
@@ -425,11 +512,23 @@ export const Canvas = ({
           onMouseMove={handleMove}
           onMouseUp={handleEnd}
           onMouseLeave={handleEnd}
-          onTouchStart={handleStart}
-          onTouchMove={handleMove}
-          onTouchEnd={handleEnd}
-          className="canvas-grid-bg w-full h-full cursor-crosshair block rounded-2xl shadow-2xl"
+          className="canvas-grid-bg w-full h-full cursor-crosshair block rounded-2xl shadow-2xl draw-surface"
         />
+
+        {touchPreview && isDrawing && (
+          <div
+            className="pointer-events-none absolute rounded-full border-2 border-white/50 z-20"
+            style={{
+              left: `${(touchPreview.x / CANVAS_WIDTH) * 100}%`,
+              top: `${(touchPreview.y / CANVAS_HEIGHT) * 100}%`,
+              width: previewSize,
+              height: previewSize,
+              transform: 'translate(-50%, -50%)',
+              backgroundColor: previewColor,
+              opacity: activeTool === 'highlighter' ? 0.45 : activeTool === 'eraser' ? 0.2 : 0.55
+            }}
+          />
+        )}
 
         {/* Interactive Resizable & Draggable Overlay */}
         {activePlacement && (
