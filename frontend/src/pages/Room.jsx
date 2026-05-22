@@ -487,7 +487,7 @@ export const Room = () => {
                 required
                 maxLength={16}
                 value={modalInput}
-                onChange={(e) => setRoomIdInput ? setModalInput(e.target.value) : setModalInput(e.target.value)}
+                onChange={(e) => setModalInput(e.target.value)}
                 placeholder="Your name"
                 className="w-full pinterest-input bg-[#1F1313] px-4 py-3.5 text-sm text-center font-bold tracking-wide placeholder:font-normal placeholder:tracking-normal"
               />
