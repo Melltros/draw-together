@@ -16,7 +16,9 @@ import {
   Check,
   Globe,
   Loader2,
-  Palette
+  Palette,
+  MessageSquare,
+  Users
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -35,11 +37,23 @@ export const Room = () => {
   const [roomExistsChecked, setRoomExistsChecked] = useState(false);
   const [roomCheckingError, setRoomCheckingError] = useState(null);
 
+  // Responsive sidebar toggles
+  const [showLeftSidebar, setShowLeftSidebar] = useState(false);
+  const [showRightSidebar, setShowRightSidebar] = useState(false);
+
   // Drawing config states
   const [activeTool, setActiveTool] = useState('pen'); // 'pen', 'eraser', 'line', 'rect', 'circle', 'text'
   const [color, setColor] = useState('#FF4D4D');
   const [brushSize, setBrushSize] = useState(5);
   
+  // Custom tool changer that auto-collapses left sidebar on mobile screen
+  const handleActiveToolChange = (tool) => {
+    setActiveTool(tool);
+    if (window.innerWidth < 768) {
+      setShowLeftSidebar(false);
+    }
+  };
+
   // Vector stroke state & Undo/Redo tracking
   const [strokes, setStrokes] = useState([]);
   const [undoStack, setUndoStack] = useState([]);
@@ -252,30 +266,30 @@ export const Room = () => {
   return (
     <div className="min-h-screen max-h-screen w-screen bg-[#0A0A0D] flex flex-col overflow-hidden relative">
       {/* 1. TOP NAVBAR PANEL */}
-      <header className="h-14 glass-panel border-b border-dark-border px-5 flex items-center justify-between shrink-0 select-none">
+      <header className="h-14 glass-panel border-b border-dark-border px-4 sm:px-5 flex items-center justify-between shrink-0 select-none">
         {/* Left Back Button */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           <button
             onClick={() => navigate('/')}
-            className="flex items-center gap-1.5 text-xs font-semibold text-gray-400 hover:text-white transition-all bg-dark-card border border-dark-border/50 hover:bg-dark-hover px-3 py-1.5 rounded-xl active:scale-95"
+            className="flex items-center gap-1.5 text-xs font-semibold text-gray-400 hover:text-white transition-all bg-dark-card border border-dark-border/50 hover:bg-dark-hover px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-xl active:scale-95"
           >
             <ArrowLeft size={13} />
-            Exit Board
+            <span className="hidden sm:inline">Exit</span>
           </button>
           
           <div className="h-4 w-[1px] bg-dark-border" />
           
           {/* Room details */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-500 font-bold uppercase tracking-wider">BOARD</span>
-            <span className="text-sm font-extrabold text-white tracking-widest bg-indigo-600/10 border border-indigo-500/20 px-2.5 py-0.5 rounded-lg">
+          <div className="flex items-center gap-1.5">
+            <span className="hidden xs:inline text-[10px] text-gray-500 font-bold uppercase tracking-wider">BOARD</span>
+            <span className="text-xs sm:text-sm font-extrabold text-white tracking-widest bg-indigo-600/10 border border-indigo-500/20 px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-lg">
               {formattedRoomId}
             </span>
           </div>
         </div>
 
         {/* Center Connection Indicator */}
-        <div className="hidden sm:flex items-center gap-2">
+        <div className="hidden md:flex items-center gap-2">
           <div className="relative flex items-center">
             <span
               className={`w-2.5 h-2.5 rounded-full shrink-0 ${
@@ -294,10 +308,10 @@ export const Room = () => {
         {/* Right Invite / Share button */}
         <div className="flex items-center gap-2">
           {username && (
-            <div className="flex items-center gap-2 bg-dark-card/50 border border-dark-border/50 rounded-xl py-1 px-2.5">
+            <div className="hidden sm:flex items-center gap-2 bg-dark-card/50 border border-dark-border/50 rounded-xl py-1 px-2.5">
               <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">You:</span>
               <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: userColor }} />
-              <span className="text-xs font-semibold text-gray-300 truncate max-w-[100px]">
+              <span className="text-xs font-semibold text-gray-300 truncate max-w-[80px]">
                 {username}
               </span>
             </div>
@@ -305,10 +319,38 @@ export const Room = () => {
 
           <button
             onClick={handleCopyLink}
-            className="flex items-center gap-1.5 text-xs font-semibold text-indigo-400 bg-indigo-500/10 border border-indigo-500/25 px-3 py-1.5 rounded-xl hover:bg-indigo-500/20 transition-all hover:scale-105 active:scale-95"
+            className="flex items-center gap-1.5 text-xs font-semibold text-indigo-400 bg-indigo-500/10 border border-indigo-500/25 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-xl hover:bg-indigo-500/20 transition-all hover:scale-105 active:scale-95"
           >
             {copiedLink ? <Check size={13} className="animate-bounce" /> : <Copy size={13} />}
-            {copiedLink ? 'Copied URL!' : 'Copy Invite Link'}
+            <span className="hidden xs:inline">{copiedLink ? 'Copied URL!' : 'Share'}</span>
+          </button>
+
+          {/* Mobile responsive sidebar togglers */}
+          <button
+            onClick={() => {
+              setShowLeftSidebar(!showLeftSidebar);
+              setShowRightSidebar(false);
+            }}
+            className="md:hidden flex items-center justify-center w-9 h-9 rounded-xl bg-dark-card hover:bg-dark-hover border border-dark-border/50 text-indigo-400 active:scale-95"
+            title="Toggle Drawing Tools"
+          >
+            <Palette size={16} />
+          </button>
+
+          <button
+            onClick={() => {
+              setShowRightSidebar(!showRightSidebar);
+              setShowLeftSidebar(false);
+            }}
+            className="md:hidden flex items-center justify-center w-9 h-9 rounded-xl bg-dark-card hover:bg-dark-hover border border-dark-border/50 text-indigo-400 active:scale-95 relative"
+            title="Toggle Chat & Painters"
+          >
+            <MessageSquare size={16} />
+            {activeUsers.length > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-indigo-600 rounded-full text-[9px] font-bold text-white flex items-center justify-center">
+                {activeUsers.length}
+              </span>
+            )}
           </button>
         </div>
       </header>
@@ -316,10 +358,14 @@ export const Room = () => {
       {/* 2. MAIN DASHBOARD CONTENT AREA */}
       <div className="flex-1 flex overflow-hidden min-h-0 relative p-4 gap-4">
         {/* LEFT WORKSPACE BAR (Drawing tools floating sidebar) */}
-        <div className="flex flex-col shrink-0 gap-3 z-10 select-none">
+        <div 
+          className={`flex-col shrink-0 gap-3 z-30 select-none absolute md:relative top-16 md:top-0 left-4 md:left-0 transition-all duration-300 ${
+            showLeftSidebar ? 'flex' : 'hidden md:flex'
+          }`}
+        >
           <Toolbar
             activeTool={activeTool}
-            setActiveTool={setActiveTool}
+            setActiveTool={handleActiveToolChange}
             color={color}
             setColor={setColor}
             brushSize={brushSize}
@@ -347,17 +393,17 @@ export const Room = () => {
           />
 
           {/* 3. BOTTOM PANEL ACTIONS */}
-          <div className="h-14 glass-panel rounded-2xl flex items-center justify-between px-5 select-none shrink-0 border border-dark-border shadow-glow-primary">
+          <div className="h-14 glass-panel rounded-2xl flex items-center justify-between px-4 sm:px-5 select-none shrink-0 border border-dark-border shadow-glow-primary">
             {/* Undo / Redo buttons */}
             <div className="flex items-center gap-2">
               <button
                 onClick={handleLocalUndo}
                 disabled={undoStack.length === 0}
                 title="Undo (Ctrl+Z)"
-                className="flex items-center gap-1.5 px-3.5 py-2 bg-dark-card hover:bg-dark-hover border border-dark-border disabled:opacity-40 disabled:scale-100 disabled:bg-dark-card text-gray-300 rounded-xl transition-all duration-150 text-xs font-bold active:scale-95 shrink-0"
+                className="flex items-center gap-1 px-2.5 py-1.5 sm:gap-1.5 sm:px-3.5 sm:py-2 bg-dark-card hover:bg-dark-hover border border-dark-border disabled:opacity-40 disabled:scale-100 disabled:bg-dark-card text-gray-300 rounded-xl transition-all duration-150 text-xs font-bold active:scale-95 shrink-0"
               >
                 <Undo2 size={14} />
-                Undo
+                <span className="hidden sm:inline">Undo</span>
                 <span className="text-[9px] font-bold text-gray-600 bg-black/25 px-1.5 py-0.5 rounded-md">
                   {undoStack.length}
                 </span>
@@ -367,10 +413,10 @@ export const Room = () => {
                 onClick={handleLocalRedo}
                 disabled={redoStack.length === 0}
                 title="Redo (Ctrl+Y)"
-                className="flex items-center gap-1.5 px-3.5 py-2 bg-dark-card hover:bg-dark-hover border border-dark-border disabled:opacity-40 disabled:scale-100 disabled:bg-dark-card text-gray-300 rounded-xl transition-all duration-150 text-xs font-bold active:scale-95 shrink-0"
+                className="flex items-center gap-1 px-2.5 py-1.5 sm:gap-1.5 sm:px-3.5 sm:py-2 bg-dark-card hover:bg-dark-hover border border-dark-border disabled:opacity-40 disabled:scale-100 disabled:bg-dark-card text-gray-300 rounded-xl transition-all duration-150 text-xs font-bold active:scale-95 shrink-0"
               >
                 <Redo2 size={14} />
-                Redo
+                <span className="hidden sm:inline">Redo</span>
                 <span className="text-[9px] font-bold text-gray-600 bg-black/25 px-1.5 py-0.5 rounded-md">
                   {redoStack.length}
                 </span>
@@ -381,27 +427,39 @@ export const Room = () => {
             <button
               onClick={handleLocalClear}
               disabled={strokes.length === 0}
-              className="flex items-center gap-1.5 px-4 py-2 hover:bg-rose-500/10 border border-dark-border text-rose-400 hover:text-rose-300 rounded-xl transition-all duration-150 text-xs font-bold active:scale-95 disabled:opacity-30 disabled:scale-100 shrink-0"
+              className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 hover:bg-rose-500/10 border border-dark-border text-rose-400 hover:text-rose-300 rounded-xl transition-all duration-150 text-xs font-bold active:scale-95 disabled:opacity-30 disabled:scale-100 shrink-0"
             >
               <Trash2 size={14} />
-              Clear Canvas
+              <span className="hidden sm:inline">Clear Canvas</span>
             </button>
 
             {/* Download/Share Board */}
             <div className="flex items-center gap-2">
               <button
                 onClick={handleDownload}
-                className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-lg shadow-indigo-600/10 hover:shadow-indigo-600/20 transition-all duration-150 text-xs font-bold active:scale-95 shrink-0"
+                className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-lg shadow-indigo-600/10 hover:shadow-indigo-600/20 transition-all duration-150 text-xs font-bold active:scale-95 shrink-0"
               >
                 <Download size={14} />
-                Download PNG
+                <span className="hidden sm:inline">Download PNG</span>
               </button>
             </div>
           </div>
         </div>
 
         {/* RIGHT WORKSPACE BAR (User profiles list + chat panels) */}
-        <div className="w-80 shrink-0 flex flex-col h-full min-h-0 z-10">
+        <div 
+          className={`flex-col shrink-0 w-80 h-[calc(100%-2rem)] md:h-full min-h-0 z-30 absolute md:relative top-16 md:top-0 right-4 md:right-0 bg-dark-bg/95 md:bg-transparent border border-dark-border md:border-0 rounded-2xl md:rounded-none shadow-2xl md:shadow-none p-4 md:p-0 transition-all duration-300 ${
+            showRightSidebar ? 'flex' : 'hidden md:flex'
+          }`}
+        >
+          <div className="flex md:hidden justify-end mb-2">
+            <button
+              onClick={() => setShowRightSidebar(false)}
+              className="text-xs font-semibold text-indigo-400 bg-indigo-500/10 border border-indigo-500/25 px-3 py-1.5 rounded-xl active:scale-95"
+            >
+              Close Drawer
+            </button>
+          </div>
           <UserList activeUsers={activeUsers} selfUserId={userId} />
           <Chat chatMessages={chatMessages} sendMessage={sendMessage} />
         </div>

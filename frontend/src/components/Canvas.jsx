@@ -198,8 +198,9 @@ export const Canvas = ({
     const rect = canvas.getBoundingClientRect();
 
     // Support both mouse and touch events
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const hasTouches = e.touches && e.touches.length > 0;
+    const clientX = hasTouches ? e.touches[0].clientX : e.clientX;
+    const clientY = hasTouches ? e.touches[0].clientY : e.clientY;
 
     const x = (clientX - rect.left) * (canvas.width / rect.width);
     const y = (clientY - rect.top) * (canvas.height / rect.height);
@@ -220,8 +221,9 @@ export const Canvas = ({
       // Calculate relative percentage coordinates of click on client viewport bounds
       const canvas = canvasRef.current;
       const rect = canvas.getBoundingClientRect();
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const hasTouches = e.touches && e.touches.length > 0;
+      const clientX = hasTouches ? e.touches[0].clientX : e.clientX;
+      const clientY = hasTouches ? e.touches[0].clientY : e.clientY;
 
       const x = clientX - rect.left;
       const y = clientY - rect.top;
