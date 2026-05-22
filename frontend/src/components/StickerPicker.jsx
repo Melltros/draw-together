@@ -24,7 +24,7 @@ export const StickerPicker = ({
       </div>
 
       <p className="ux-hint">
-        Pick a sticker, then <strong className="text-white">tap the canvas</strong> where you want it.
+        Tap a sticker, then <strong className="text-white">drag on the canvas</strong> to position it, and press <strong className="text-white">Place sticker</strong>.
       </p>
 
       <div className="sticker-scroll flex gap-1.5 overflow-x-auto pb-1">

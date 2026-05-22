@@ -1,8 +1,12 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { MousePointer, Check, X, Move } from 'lucide-react';
+import { MousePointer } from 'lucide-react';
+import { drawStroke, STROKE_TOOLS } from '../utils/drawStroke';
+import { createFillPatch } from '../utils/canvasFill';
+import { CANVAS_SIZE } from '../constants/canvas';
+import { StickerPlacementBar } from './StickerPlacementBar';
 
-const STROKE_TOOLS = new Set(['pen', 'eraser', 'highlighter', 'glow']);
-
+const CANVAS_WIDTH = CANVAS_SIZE;
+const CANVAS_HEIGHT = CANVAS_SIZE;
 export const Canvas = ({
   strokes,
   setStrokes,
@@ -19,30 +23,28 @@ export const Canvas = ({
   redoStack,
   setRedoStack,
   selectedSticker = null,
-  stickerSize = 64
+  stickerSize = 64,
+  onPlacementModeChange,
+  onStickerSizeChange
 }) => {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
+  const fillImageCache = useRef({});
   const [isDrawing, setIsDrawing] = useState(false);
   const [startPoint, setStartPoint] = useState(null);
   const [currentPoints, setCurrentPoints] = useState([]);
-  
-  // Remote active strokes cache (user drawing live shapes or pen strokes)
   const [remoteActiveStrokes, setRemoteActiveStrokes] = useState({});
-
-  // Interactive Text / Sticker Placement State
-  const [activePlacement, setActivePlacement] = useState(null); // { canvasX, canvasY, text, type: 'text'|'sticker', size, color }
-
-  // Dragging placement state
-  const [isDraggingPlacement, setIsDraggingPlacement] = useState(false);
+  const [activePlacement, setActivePlacement] = useState(null);
+  const [stickerDraft, setStickerDraft] = useState(null);
   const [touchPreview, setTouchPreview] = useState(null);
-  const dragStartRef = useRef({ x: 0, y: 0, placementX: 0, placementY: 0 });
+
   const isDrawingRef = useRef(false);
   const activeToolRef = useRef(activeTool);
   const colorRef = useRef(color);
   const brushSizeRef = useRef(brushSize);
   const selectedStickerRef = useRef(selectedSticker);
   const stickerSizeRef = useRef(stickerSize);
+  const stickerDraftRef = useRef(stickerDraft);
 
   useEffect(() => {
     activeToolRef.current = activeTool;
@@ -56,128 +58,32 @@ export const Canvas = ({
   }, [selectedSticker, stickerSize]);
 
   useEffect(() => {
+    stickerDraftRef.current = stickerDraft;
+    onPlacementModeChange?.(!!stickerDraft || !!activePlacement);
+  }, [stickerDraft, activePlacement, onPlacementModeChange]);
+
+  useEffect(() => {
     isDrawingRef.current = isDrawing;
-    window.__paintsyncDrawing = isDrawing;
-  }, [isDrawing]);
+    window.__paintsyncDrawing = isDrawing || !!stickerDraft;
+  }, [isDrawing, stickerDraft]);
 
-  // Fixed internal backing store dimensions (Square 1600x1600 gives mobile 2.5x more vertical space!)
-  const CANVAS_WIDTH = 1600;
-  const CANVAS_HEIGHT = 1600;
+  const commitStroke = useCallback(
+    (stroke) => {
+      setStrokes((prev) => [...prev, stroke]);
+      setUndoStack((prev) => {
+        const updated = [...prev, stroke];
+        if (updated.length > 20) updated.shift();
+        return updated;
+      });
+      setRedoStack([]);
+      emitDraw({ type: 'complete', userId, stroke, isComplete: true });
+    },
+    [setStrokes, setUndoStack, setRedoStack, emitDraw, userId]
+  );
 
-  // 1. Drawing helper function
-  const drawStroke = (ctx, stroke) => {
-    if (!stroke) return;
-    
-    ctx.save();
-    ctx.beginPath();
-    ctx.strokeStyle = stroke.color;
-    ctx.lineWidth = stroke.size;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-
-    if (stroke.tool === 'eraser') {
-      ctx.globalCompositeOperation = 'destination-out';
-    } else {
-      ctx.globalCompositeOperation = 'source-over';
-    }
-
-    if (STROKE_TOOLS.has(stroke.tool)) {
-      if (stroke.tool === 'highlighter') {
-        ctx.globalAlpha = 0.38;
-        ctx.lineWidth = stroke.size * 1.8;
-      } else if (stroke.tool === 'glow') {
-        ctx.lineWidth = Math.max(stroke.size, 3);
-        ctx.shadowBlur = stroke.size * 2.5;
-        ctx.shadowColor = stroke.color;
-        ctx.strokeStyle = stroke.color;
-      }
-      if (stroke.points && stroke.points.length > 0) {
-        ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
-        for (let i = 1; i < stroke.points.length; i++) {
-          ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
-        }
-        ctx.stroke();
-        if (stroke.tool === 'glow') {
-          ctx.shadowBlur = stroke.size * 1.2;
-          ctx.globalAlpha = 0.85;
-          ctx.stroke();
-        }
-      }
-      ctx.shadowBlur = 0;
-      ctx.globalAlpha = 1;
-    } else if (stroke.tool === 'line') {
-      if (stroke.startPoint && stroke.endPoint) {
-        ctx.moveTo(stroke.startPoint.x, stroke.startPoint.y);
-        ctx.lineTo(stroke.endPoint.x, stroke.endPoint.y);
-        ctx.stroke();
-      }
-    } else if (stroke.tool === 'rect') {
-      if (stroke.startPoint && stroke.endPoint) {
-        const x = stroke.startPoint.x;
-        const y = stroke.startPoint.y;
-        const w = stroke.endPoint.x - x;
-        const h = stroke.endPoint.y - y;
-        ctx.strokeRect(x, y, w, h);
-      }
-    } else if (stroke.tool === 'circle') {
-      if (stroke.startPoint && stroke.endPoint) {
-        const x = stroke.startPoint.x;
-        const y = stroke.startPoint.y;
-        const rx = stroke.endPoint.x - x;
-        const ry = stroke.endPoint.y - y;
-        const radius = Math.sqrt(rx * rx + ry * ry);
-        ctx.arc(x, y, radius, 0, 2 * Math.PI);
-        ctx.stroke();
-      }
-    } else if (stroke.tool === 'text') {
-      if (stroke.startPoint && stroke.text) {
-        ctx.fillStyle = stroke.color;
-        ctx.font = `${stroke.size}px Outfit, sans-serif`;
-        ctx.textBaseline = 'top';
-        ctx.fillText(stroke.text, stroke.startPoint.x, stroke.startPoint.y);
-      }
-    } else if (stroke.tool === 'sticker') {
-      if (stroke.startPoint && stroke.text) {
-        ctx.font = `${stroke.size}px Outfit, sans-serif`;
-        ctx.textBaseline = 'top';
-        ctx.fillText(stroke.text, stroke.startPoint.x, stroke.startPoint.y);
-      }
-    }
-
-    ctx.restore();
-  };
-
-  // 2. Redraw canvas
-  const redrawCanvas = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Draw completed
-    strokes.forEach((stroke) => {
-      drawStroke(ctx, stroke);
-    });
-
-    // Draw remote active
-    Object.values(remoteActiveStrokes).forEach((stroke) => {
-      drawStroke(ctx, stroke);
-    });
-
-    // Draw local preview
-    if (isDrawing) {
-      const localActiveStroke = getLocalActiveStroke();
-      if (localActiveStroke) {
-        drawStroke(ctx, localActiveStroke);
-      }
-    }
-  };
-
-  const getLocalActiveStroke = () => {
+  const getLocalActiveStroke = useCallback(() => {
     if (!startPoint) return null;
     const tool = activeToolRef.current;
-
     const baseStroke = {
       userId,
       username,
@@ -185,34 +91,62 @@ export const Canvas = ({
       color: tool === 'eraser' ? '#ffffff' : colorRef.current,
       size: brushSizeRef.current
     };
+    if (STROKE_TOOLS.has(tool)) return { ...baseStroke, points: currentPoints };
+    const last = currentPoints[currentPoints.length - 1];
+    if (!last) return null;
+    return { ...baseStroke, startPoint, endPoint: last };
+  }, [startPoint, currentPoints, userId, username]);
 
-    if (STROKE_TOOLS.has(tool)) {
-      return { ...baseStroke, points: currentPoints };
-    } else {
-      const lastPoint = currentPoints[currentPoints.length - 1];
-      if (!lastPoint) return null;
-      return {
-        ...baseStroke,
-        startPoint,
-        endPoint: lastPoint
-      };
+  const redrawCanvasRef = useRef(() => {});
+
+  const drawFillStroke = (ctx, stroke) => {
+    if (!stroke.dataUrl) return;
+    let img = fillImageCache.current[stroke.dataUrl];
+    if (!img) {
+      img = new Image();
+      img.src = stroke.dataUrl;
+      img.onload = () => redrawCanvasRef.current();
+      fillImageCache.current[stroke.dataUrl] = img;
+    }
+    if (img.complete && img.naturalWidth) {
+      ctx.drawImage(img, stroke.x, stroke.y, stroke.width, stroke.height);
     }
   };
 
+  const redrawCanvas = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    strokes.forEach((stroke) => {
+      if (stroke.tool === 'fill') drawFillStroke(ctx, stroke);
+      else drawStroke(ctx, stroke);
+    });
+
+    Object.values(remoteActiveStrokes).forEach((stroke) => {
+      if (stroke.tool === 'fill') drawFillStroke(ctx, stroke);
+      else drawStroke(ctx, stroke);
+    });
+
+    if (isDrawing && startPoint) {
+      const local = getLocalActiveStroke();
+      if (local) drawStroke(ctx, local);
+    }
+  }, [strokes, remoteActiveStrokes, isDrawing, startPoint, getLocalActiveStroke]);
+
+  redrawCanvasRef.current = redrawCanvas;
+
   useEffect(() => {
     redrawCanvas();
-  }, [strokes, remoteActiveStrokes, isDrawing, currentPoints]);
+  }, [redrawCanvas]);
 
   useEffect(() => {
-    const handleRemoteDraw = (drawData) => {
+    window.handleRemoteDraw = (drawData) => {
       if (!drawData) return;
       const { type, stroke, userId: senderId } = drawData;
-
       if (type === 'preview') {
-        setRemoteActiveStrokes((prev) => ({
-          ...prev,
-          [senderId]: stroke
-        }));
+        setRemoteActiveStrokes((prev) => ({ ...prev, [senderId]: stroke }));
       } else if (type === 'complete') {
         setRemoteActiveStrokes((prev) => {
           const copy = { ...prev };
@@ -222,36 +156,77 @@ export const Canvas = ({
         setStrokes((prev) => [...prev, stroke]);
       }
     };
-
-    window.handleRemoteDraw = handleRemoteDraw;
-    return () => {
-      delete window.handleRemoteDraw;
-    };
+    return () => delete window.handleRemoteDraw;
   }, [setStrokes]);
 
   const getCoordinates = (e) => {
     const canvas = canvasRef.current;
     if (!canvas) return null;
     const rect = canvas.getBoundingClientRect();
-
-    const hasTouches = e.touches && e.touches.length > 0;
-    const clientX = hasTouches ? e.touches[0].clientX : e.clientX;
-    const clientY = hasTouches ? e.touches[0].clientY : e.clientY;
-
-    const x = (clientX - rect.left) * (canvas.width / rect.width);
-    const y = (clientY - rect.top) * (canvas.height / rect.height);
-    
-    return { x, y };
+    const t = e.touches?.[0];
+    const clientX = t ? t.clientX : e.clientX;
+    const clientY = t ? t.clientY : e.clientY;
+    return {
+      x: (clientX - rect.left) * (canvas.width / rect.width),
+      y: (clientY - rect.top) * (canvas.height / rect.height)
+    };
   };
 
   const setDrawingLock = useCallback((locked) => {
     isDrawingRef.current = locked;
-    window.__paintsyncDrawing = locked;
+    window.__paintsyncDrawing = locked || !!stickerDraftRef.current;
   }, []);
+
+  const handleFill = (coords) => {
+    const patch = createFillPatch(strokes, coords.x, coords.y, colorRef.current);
+    if (!patch) return;
+    commitStroke({ ...patch, userId, username, size: 1 });
+    if (navigator.vibrate) navigator.vibrate(12);
+  };
+
+  const startStickerDraft = (coords) => {
+    if (!selectedStickerRef.current) return;
+    setStickerDraft({
+      emoji: selectedStickerRef.current,
+      canvasX: coords.x,
+      canvasY: coords.y,
+      size: stickerSizeRef.current
+    });
+  };
+
+  const placeStickerDraft = () => {
+    const draft = stickerDraftRef.current;
+    if (!draft?.emoji) return;
+    commitStroke({
+      userId,
+      username,
+      tool: 'sticker',
+      color: '#ffffff',
+      size: draft.size,
+      startPoint: { x: draft.canvasX, y: draft.canvasY },
+      text: draft.emoji
+    });
+    setStickerDraft(null);
+    if (navigator.vibrate) navigator.vibrate(10);
+  };
 
   const handleStart = (e) => {
     const coords = getCoordinates(e);
     if (!coords) return;
+
+    if (activeToolRef.current === 'fill') {
+      handleFill(coords);
+      return;
+    }
+
+    if (activeToolRef.current === 'sticker') {
+      if (stickerDraftRef.current) {
+        setStickerDraft((d) => (d ? { ...d, canvasX: coords.x, canvasY: coords.y } : d));
+      } else {
+        startStickerDraft(coords);
+      }
+      return;
+    }
 
     if (activeToolRef.current === 'text') {
       setActivePlacement({
@@ -265,18 +240,6 @@ export const Canvas = ({
       return;
     }
 
-    if (activeToolRef.current === 'sticker' && selectedStickerRef.current) {
-      setActivePlacement({
-        canvasX: coords.x,
-        canvasY: coords.y,
-        text: selectedStickerRef.current,
-        type: 'sticker',
-        size: stickerSizeRef.current,
-        color: '#ffffff'
-      });
-      return;
-    }
-
     setIsDrawing(true);
     setDrawingLock(true);
     setStartPoint({ x: coords.x, y: coords.y });
@@ -284,94 +247,84 @@ export const Canvas = ({
     setTouchPreview({ x: coords.x, y: coords.y });
 
     const tool = activeToolRef.current;
-    const baseStroke = {
+    const base = {
       userId,
       username,
       tool,
       color: tool === 'eraser' ? '#ffffff' : colorRef.current,
       size: brushSizeRef.current
     };
-
     const activeStroke = STROKE_TOOLS.has(tool)
-      ? { ...baseStroke, points: [{ x: coords.x, y: coords.y }] }
-      : { ...baseStroke, startPoint: { x: coords.x, y: coords.y }, endPoint: { x: coords.x, y: coords.y } };
+      ? { ...base, points: [{ x: coords.x, y: coords.y }] }
+      : { ...base, startPoint: { x: coords.x, y: coords.y }, endPoint: { x: coords.x, y: coords.y } };
 
-    emitDraw({
-      type: 'preview',
-      userId,
-      stroke: activeStroke
-    });
+    emitDraw({ type: 'preview', userId, stroke: activeStroke });
   };
 
   const handleMove = (e) => {
     const coords = getCoordinates(e);
     if (!coords) return;
-
     emitCursorMove(coords.x, coords.y);
-    if (isDrawingRef.current) {
-      setTouchPreview({ x: coords.x, y: coords.y });
+
+    if (stickerDraftRef.current && activeToolRef.current === 'sticker') {
+      setStickerDraft((d) => (d ? { ...d, canvasX: coords.x, canvasY: coords.y } : d));
+      return;
     }
 
-    if (!isDrawingRef.current || activeToolRef.current === 'text' || activeToolRef.current === 'sticker') return;
+    if (isDrawingRef.current) setTouchPreview({ x: coords.x, y: coords.y });
+    if (!isDrawingRef.current || activeToolRef.current === 'text') return;
 
     setCurrentPoints((prev) => {
       const updated = [...prev, { x: coords.x, y: coords.y }];
       const tool = activeToolRef.current;
-      const baseStroke = {
+      const base = {
         userId,
         username,
         tool,
         color: tool === 'eraser' ? '#ffffff' : colorRef.current,
         size: brushSizeRef.current
       };
-
       const activeStroke = STROKE_TOOLS.has(tool)
-        ? { ...baseStroke, points: updated }
-        : { ...baseStroke, startPoint, endPoint: { x: coords.x, y: coords.y } };
-
-      emitDraw({
-        type: 'preview',
-        userId,
-        stroke: activeStroke
-      });
-
+        ? { ...base, points: updated }
+        : { ...base, startPoint, endPoint: { x: coords.x, y: coords.y } };
+      emitDraw({ type: 'preview', userId, stroke: activeStroke });
       return updated;
     });
   };
 
   const handleEnd = () => {
-    if (!isDrawingRef.current || activeToolRef.current === 'text' || activeToolRef.current === 'sticker') return;
+    if (activeToolRef.current === 'sticker' || activeToolRef.current === 'text' || activeToolRef.current === 'fill') return;
+    if (!isDrawingRef.current) return;
+
     setIsDrawing(false);
     setDrawingLock(false);
     setTouchPreview(null);
-
-    if (typeof navigator !== 'undefined' && navigator.vibrate) {
-      navigator.vibrate(8);
-    }
+    if (navigator.vibrate) navigator.vibrate(8);
 
     const finalStroke = getLocalActiveStroke();
-    if (finalStroke) {
-      setStrokes((prev) => [...prev, finalStroke]);
-      setUndoStack((prev) => {
-        const updated = [...prev, finalStroke];
-        if (updated.length > 20) updated.shift();
-        return updated;
-      });
-      setRedoStack([]);
-
-      emitDraw({
-        type: 'complete',
-        userId,
-        stroke: finalStroke,
-        isComplete: true
-      });
-    }
-
+    if (finalStroke) commitStroke(finalStroke);
     setStartPoint(null);
     setCurrentPoints([]);
   };
 
-  const handlersRef = useRef({ handleStart, handleMove, handleEnd });
+  const handlePlacementSubmit = () => {
+    if (!activePlacement?.text?.trim()) {
+      setActivePlacement(null);
+      return;
+    }
+    commitStroke({
+      userId,
+      username,
+      tool: 'text',
+      color: activePlacement.color,
+      size: activePlacement.size,
+      startPoint: { x: activePlacement.canvasX, y: activePlacement.canvasY },
+      text: activePlacement.text.trim()
+    });
+    setActivePlacement(null);
+  };
+
+  const handlersRef = useRef({});
   handlersRef.current = { handleStart, handleMove, handleEnd };
 
   useEffect(() => {
@@ -381,17 +334,14 @@ export const Canvas = ({
 
     const onTouchStart = (e) => {
       if (e.cancelable) e.preventDefault();
-      e.stopPropagation();
       handlersRef.current.handleStart(e);
     };
     const onTouchMove = (e) => {
       if (e.cancelable) e.preventDefault();
-      e.stopPropagation();
       handlersRef.current.handleMove(e);
     };
     const onTouchEnd = (e) => {
       if (e.cancelable) e.preventDefault();
-      e.stopPropagation();
       handlersRef.current.handleEnd(e);
     };
 
@@ -414,258 +364,136 @@ export const Canvas = ({
     };
   }, []);
 
-  // Dragging handling for placement
-  const handleDragStart = (e) => {
-    e.stopPropagation();
-    const hasTouches = e.touches && e.touches.length > 0;
-    const clientX = hasTouches ? e.touches[0].clientX : e.clientX;
-    const clientY = hasTouches ? e.touches[0].clientY : e.clientY;
-
-    dragStartRef.current = {
-      x: clientX,
-      y: clientY,
-      placementX: activePlacement.canvasX,
-      placementY: activePlacement.canvasY
-    };
-    setIsDraggingPlacement(true);
-  };
-
-  useEffect(() => {
-    if (!isDraggingPlacement) return;
-
-    const handleDragMove = (e) => {
-      const hasTouches = e.touches && e.touches.length > 0;
-      const clientX = hasTouches ? e.touches[0].clientX : e.clientX;
-      const clientY = hasTouches ? e.touches[0].clientY : e.clientY;
-
-      const dx = clientX - dragStartRef.current.x;
-      const dy = clientY - dragStartRef.current.y;
-
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const rect = canvas.getBoundingClientRect();
-
-      // Convert screen delta to canvas delta
-      const canvasDx = dx * (CANVAS_WIDTH / rect.width);
-      const canvasDy = dy * (CANVAS_HEIGHT / rect.height);
-
-      setActivePlacement((prev) => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          canvasX: dragStartRef.current.placementX + canvasDx,
-          canvasY: dragStartRef.current.placementY + canvasDy
-        };
-      });
-    };
-
-    const handleDragEnd = () => {
-      setIsDraggingPlacement(false);
-    };
-
-    window.addEventListener('mousemove', handleDragMove);
-    window.addEventListener('mouseup', handleDragEnd);
-    window.addEventListener('touchmove', handleDragMove, { passive: true });
-    window.addEventListener('touchend', handleDragEnd);
-
-    return () => {
-      window.removeEventListener('mousemove', handleDragMove);
-      window.removeEventListener('mouseup', handleDragEnd);
-      window.removeEventListener('touchmove', handleDragMove);
-      window.removeEventListener('touchend', handleDragEnd);
-    };
-  }, [isDraggingPlacement]);
-
-  const handlePlacementSubmit = () => {
-    if (activePlacement && activePlacement.text.trim()) {
-      const isSticker = activePlacement.type === 'sticker';
-      const stroke = {
-        userId,
-        username,
-        tool: isSticker ? 'sticker' : 'text',
-        color: isSticker ? '#ffffff' : activePlacement.color,
-        size: activePlacement.size,
-        startPoint: { x: activePlacement.canvasX, y: activePlacement.canvasY },
-        text: activePlacement.text.trim()
-      };
-
-      setStrokes((prev) => [...prev, stroke]);
-      setUndoStack((prev) => {
-        const updated = [...prev, stroke];
-        if (updated.length > 20) updated.shift();
-        return updated;
-      });
-      setRedoStack([]);
-
-      emitDraw({
-        type: 'complete',
-        userId,
-        stroke,
-        isComplete: true
-      });
-    }
-    setActivePlacement(null);
-  };
-
   const previewColor =
-    activeTool === 'eraser'
-      ? '#ffffff'
-      : activeTool === 'highlighter'
-        ? `${color}99`
-        : activeTool === 'glow'
-          ? color
-          : color;
-  const previewSize = Math.min(
-    brushSize * (activeTool === 'highlighter' ? 1.8 : activeTool === 'glow' ? 1.4 : 1),
-    48
-  );
-  const previewGlow = activeTool === 'glow' ? `0 0 ${brushSize * 2}px ${color}` : undefined;
+    activeTool === 'eraser' ? '#ffffff' : activeTool === 'highlighter' ? `${color}99` : color;
+  const previewSize = Math.min(brushSize * (activeTool === 'highlighter' ? 1.8 : activeTool === 'glow' ? 1.4 : 1), 48);
+
+  const cursorClass =
+    activeTool === 'fill'
+      ? 'cursor-cell'
+      : activeTool === 'sticker'
+        ? 'cursor-copy'
+        : 'cursor-crosshair';
 
   return (
-    <div
-      ref={containerRef}
-      className="draw-surface relative flex-1 h-full w-full bg-[#0D0D12] overflow-hidden rounded-2xl border border-dark-border/40 flex items-center justify-center min-h-0 min-w-0"
-    >
-      <div className="relative aspect-square max-w-full max-h-full draw-surface">
-        <canvas
-          ref={canvasRef}
-          width={CANVAS_WIDTH}
-          height={CANVAS_HEIGHT}
-          onMouseDown={handleStart}
-          onMouseMove={handleMove}
-          onMouseUp={handleEnd}
-          onMouseLeave={handleEnd}
-          className="canvas-grid-bg w-full h-full cursor-crosshair block rounded-2xl shadow-2xl draw-surface"
+    <>
+      {stickerDraft && (
+        <StickerPlacementBar
+          emoji={stickerDraft.emoji}
+          size={stickerDraft.size}
+          onSizeChange={(s) => {
+            setStickerDraft((d) => (d ? { ...d, size: s } : d));
+            onStickerSizeChange?.(s);
+          }}
+          onPlace={placeStickerDraft}
+          onCancel={() => setStickerDraft(null)}
         />
+      )}
 
-        {touchPreview && isDrawing && (
-          <div
-            className="pointer-events-none absolute rounded-full border-2 border-white/50 z-20"
-            style={{
-              left: `${(touchPreview.x / CANVAS_WIDTH) * 100}%`,
-              top: `${(touchPreview.y / CANVAS_HEIGHT) * 100}%`,
-              width: previewSize,
-              height: previewSize,
-              transform: 'translate(-50%, -50%)',
-              backgroundColor: previewColor,
-              boxShadow: previewGlow,
-              opacity: activeTool === 'highlighter' ? 0.45 : activeTool === 'eraser' ? 0.2 : activeTool === 'glow' ? 0.75 : 0.55
-            }}
+      <div
+        ref={containerRef}
+        className="draw-surface relative flex-1 h-full w-full bg-[#0D0D12] overflow-hidden rounded-2xl border border-dark-border/40 flex items-center justify-center min-h-0 min-w-0"
+      >
+        <div className="relative aspect-square max-w-full max-h-full draw-surface w-full h-full">
+          <canvas
+            ref={canvasRef}
+            width={CANVAS_WIDTH}
+            height={CANVAS_HEIGHT}
+            onMouseDown={handleStart}
+            onMouseMove={handleMove}
+            onMouseUp={handleEnd}
+            onMouseLeave={handleEnd}
+            className={`canvas-grid-bg w-full h-full block rounded-2xl shadow-2xl draw-surface ${cursorClass}`}
           />
-        )}
 
-        {/* Interactive Resizable & Draggable Overlay */}
-        {activePlacement && (
-          <div
-            className="absolute z-40 bg-[#352323]/98 border border-[#C73543]/50 rounded-2xl p-3.5 shadow-2xl flex flex-col gap-2.5 min-w-[220px] max-w-[90vw]"
-            style={{
-              left: `${(activePlacement.canvasX / CANVAS_WIDTH) * 100}%`,
-              top: `${(activePlacement.canvasY / CANVAS_HEIGHT) * 100}%`,
-              transform: 'translate(-50%, -50%)',
-            }}
-          >
-            {/* Header / Drag Bar */}
+          {stickerDraft && (
             <div
-              onMouseDown={handleDragStart}
-              onTouchStart={handleDragStart}
-              className="flex items-center justify-between gap-3 border-b border-dark-border/40 pb-2 cursor-move select-none"
+              className="pointer-events-none absolute z-30 select-none"
+              style={{
+                left: `${(stickerDraft.canvasX / CANVAS_WIDTH) * 100}%`,
+                top: `${(stickerDraft.canvasY / CANVAS_HEIGHT) * 100}%`,
+                transform: 'translate(-50%, -50%)',
+                fontSize: `${stickerDraft.size}px`,
+                lineHeight: 1,
+                filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.5))'
+              }}
             >
-              <div className="flex items-center gap-1.5 text-[9px] font-extrabold text-[#F7C7CB] uppercase tracking-widest">
-                <Move size={11} />
-                <span>{activePlacement.type === 'sticker' ? 'Drag sticker' : 'Drag text'}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={handlePlacementSubmit}
-                  className="px-2.5 py-1 rounded-lg bg-emerald-600/80 text-white text-[10px] font-bold flex items-center gap-1 hover:bg-emerald-500 transition-all cursor-pointer"
-                >
-                  <Check size={12} /> Place
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActivePlacement(null)}
-                  className="px-2 py-1 rounded-lg bg-rose-500/30 text-rose-300 text-[10px] font-bold hover:bg-rose-500/50 transition-all cursor-pointer"
-                >
-                  <X size={12} />
-                </button>
-              </div>
+              {stickerDraft.emoji}
             </div>
+          )}
 
-            {/* Content Input or Emoji stamp */}
-            {activePlacement.type === 'text' ? (
+          {touchPreview && isDrawing && (
+            <div
+              className="pointer-events-none absolute rounded-full border-2 border-white/50 z-20"
+              style={{
+                left: `${(touchPreview.x / CANVAS_WIDTH) * 100}%`,
+                top: `${(touchPreview.y / CANVAS_HEIGHT) * 100}%`,
+                width: previewSize,
+                height: previewSize,
+                transform: 'translate(-50%, -50%)',
+                backgroundColor: previewColor,
+                opacity: 0.55
+              }}
+            />
+          )}
+
+          {activePlacement?.type === 'text' && (
+            <div
+              className="absolute z-40 left-1/2 -translate-x-1/2 bottom-4 w-[min(100%,280px)] pinterest-panel p-4 rounded-2xl shadow-2xl border-[#C73543]/40"
+            >
+              <p className="text-xs font-bold text-white mb-2">Add text</p>
               <input
                 type="text"
                 autoFocus
                 value={activePlacement.text}
                 onChange={(e) => setActivePlacement({ ...activePlacement, text: e.target.value })}
-                placeholder="Type here..."
+                placeholder="Type here…"
                 style={{ color: activePlacement.color }}
-                className="bg-dark-card border border-dark-border/50 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-purple-500/60 font-medium"
+                className="w-full pinterest-input px-3 py-2.5 text-sm font-semibold mb-3"
               />
-            ) : (
-              <div className="text-center py-2 select-none">
-                <span style={{ fontSize: `${activePlacement.size * 0.5}px` }}>
-                  {activePlacement.text}
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setActivePlacement(null)}
+                  className="flex-1 py-2.5 rounded-xl border border-[#523838] text-sm font-bold text-gray-300 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handlePlacementSubmit}
+                  disabled={!activePlacement.text.trim()}
+                  className="flex-1 py-2.5 rounded-xl bg-[#C73543] text-sm font-bold text-white disabled:opacity-40 cursor-pointer"
+                >
+                  Place text
+                </button>
+              </div>
+            </div>
+          )}
+
+          {Object.entries(cursors).map(([cUserId, cursor]) => {
+            if (cUserId === userId) return null;
+            const pctX = (cursor.x / CANVAS_WIDTH) * 100;
+            const pctY = (cursor.y / CANVAS_HEIGHT) * 100;
+            return (
+              <div
+                key={cUserId}
+                className="floating-cursor-label absolute pointer-events-none flex flex-col items-start"
+                style={{ left: `${pctX}%`, top: `${pctY}%` }}
+              >
+                <MousePointer size={18} style={{ color: cursor.color, fill: cursor.color }} className="-rotate-90" />
+                <span
+                  style={{ backgroundColor: cursor.color }}
+                  className="text-[9px] font-bold text-[#1F1313] px-2 py-0.5 rounded-full whitespace-nowrap"
+                >
+                  {cursor.username}
                 </span>
               </div>
-            )}
-
-            {/* Size Resizer Slider */}
-            <div className="flex flex-col gap-1 select-none">
-              <div className="flex items-center justify-between text-[9px] font-bold text-gray-500 uppercase tracking-wider">
-                <span>Scale</span>
-                <span>{activePlacement.size}px</span>
-              </div>
-              <input
-                type="range"
-                min="20"
-                max="180"
-                value={activePlacement.size}
-                onChange={(e) => setActivePlacement({ ...activePlacement, size: parseInt(e.target.value) })}
-                className="w-full cursor-ew-resize"
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Render Active Other Painter Cursors */}
-        {Object.entries(cursors).map(([cUserId, cursor]) => {
-          const canvas = canvasRef.current;
-          if (!canvas) return null;
-          if (cUserId === userId) return null;
-
-          const pctX = (cursor.x / CANVAS_WIDTH) * 100;
-          const pctY = (cursor.y / CANVAS_HEIGHT) * 100;
-
-          return (
-            <div
-              key={cUserId}
-              className="floating-cursor-label absolute pointer-events-none transition-all duration-75 flex flex-col items-start gap-1"
-              style={{
-                left: `${pctX}%`,
-                top: `${pctY}%`
-              }}
-            >
-              <MousePointer
-                size={18}
-                style={{
-                  color: cursor.color,
-                  fill: cursor.color
-                }}
-                className="drop-shadow-lg transform -rotate-90 -translate-x-1 -translate-y-1"
-              />
-              <span
-                style={{ backgroundColor: cursor.color }}
-                className="text-[9px] font-bold text-dark-bg px-2 py-0.5 rounded-full shadow-md whitespace-nowrap -translate-x-2 -translate-y-1 opacity-90 border border-black/10"
-              >
-                {cursor.username}
-              </span>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

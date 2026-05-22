@@ -51,6 +51,7 @@ export const Room = () => {
   const [brushSize, setBrushSize] = useState(5);
   const [stickerSize, setStickerSize] = useState(64);
   const [selectedSticker, setSelectedSticker] = useState(null);
+  const [placementMode, setPlacementMode] = useState(false);
 
   // Custom tool changer that auto-collapses left sidebar on mobile screen
   const handleActiveToolChange = (tool) => {
@@ -423,6 +424,8 @@ export const Room = () => {
             setRedoStack={setRedoStack}
             selectedSticker={selectedSticker}
             stickerSize={stickerSize}
+            onPlacementModeChange={setPlacementMode}
+            onStickerSizeChange={setStickerSize}
           />
 
           {/* Canvas actions — always labeled */}
@@ -538,7 +541,7 @@ export const Room = () => {
         </div>
       )}
 
-      <MobileHint />
+      {!placementMode && <MobileHint />}
 
       <MobileQuickBar
         activeTool={activeTool}
@@ -551,7 +554,7 @@ export const Room = () => {
         setStickerSize={setStickerSize}
         selectedSticker={selectedSticker}
         onSelectSticker={setSelectedSticker}
-        visible={!showLeftSidebar && !showRightSidebar}
+        visible={!showLeftSidebar && !showRightSidebar && !placementMode}
       />
 
       {/* Mobile: bottom navigation */}
