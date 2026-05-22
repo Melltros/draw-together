@@ -238,7 +238,7 @@ export const Room = () => {
   // Render checking page if board validation is taking place
   if (roomCheckingError) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-dark-bg text-center p-4">
+      <div className="min-h-dvh flex items-center justify-center bg-dark-bg text-center p-4 overflow-hidden">
         <div className="relative w-full max-w-md pinterest-panel p-8 rounded-3xl animate-scale-in">
           <div className="w-16 h-16 bg-[#C73543]/15 rounded-2xl flex items-center justify-center mx-auto mb-5">
             <Globe size={28} className="text-[#C73543]" />
@@ -258,7 +258,7 @@ export const Room = () => {
 
   if (!roomExistsChecked) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-dark-bg text-center gap-4">
+      <div className="min-h-dvh flex flex-col items-center justify-center bg-dark-bg text-center gap-4 overflow-hidden">
         <div className="relative">
           <div className="w-16 h-16 rounded-2xl bg-[#C73543]/15 flex items-center justify-center mb-4 mx-auto">
             <Loader2 size={28} className="text-[#C73543] animate-spin" />
@@ -270,8 +270,23 @@ export const Room = () => {
     );
   }
 
+  const mobileDrawerOpen = showLeftSidebar || showRightSidebar;
+
   return (
-    <div className="min-h-screen max-h-screen w-screen bg-[#2A1B1B] flex flex-col overflow-hidden relative">
+    <div className="app-shell bg-[#2A1B1B] flex flex-col relative">
+      {/* Mobile sidebar backdrop */}
+      {mobileDrawerOpen && (
+        <button
+          type="button"
+          aria-label="Close panel"
+          className="fixed inset-0 z-20 bg-black/50 backdrop-blur-[2px] md:hidden cursor-pointer"
+          onClick={() => {
+            setShowLeftSidebar(false);
+            setShowRightSidebar(false);
+          }}
+        />
+      )}
+
       {/* 1. TOP NAVBAR PANEL */}
       <header className="h-14 pinterest-panel border-b border-dark-border px-4 sm:px-5 flex items-center justify-between shrink-0 select-none">
         {/* Left */}
@@ -369,7 +384,7 @@ export const Room = () => {
       <div className="flex-1 flex overflow-hidden min-h-0 relative p-1.5 md:p-4 gap-2 md:gap-4">
         {/* LEFT WORKSPACE BAR (Drawing tools floating sidebar) */}
         <div 
-          className={`flex-col shrink-0 gap-3 z-30 select-none absolute md:relative top-16 md:top-0 left-4 md:left-0 transition-all duration-300 ${
+          className={`flex-col shrink-0 gap-3 z-30 select-none absolute md:relative top-16 md:top-0 left-3 md:left-0 transition-all duration-300 sidebar-scroll md:max-h-none md:overflow-visible ${
             showLeftSidebar ? 'flex' : 'hidden md:flex'
           }`}
         >
@@ -448,12 +463,12 @@ export const Room = () => {
 
         {/* RIGHT WORKSPACE BAR (User profiles list + chat panels) */}
         <div 
-          className={`flex-col shrink-0 w-full md:w-80 h-full min-h-0 z-30 absolute md:relative top-0 md:top-0 right-0 md:right-0 left-0 sm:left-auto md:left-auto bg-[#2A1B1B] md:bg-transparent border-l border-dark-border md:border-0 p-3 md:p-0 transition-all duration-300 ${
+          className={`flex-col shrink-0 w-[min(100%,20rem)] md:w-80 h-full min-h-0 z-30 absolute md:relative top-14 md:top-0 right-0 md:right-0 bg-[#2A1B1B] md:bg-transparent border-l border-dark-border md:border-0 p-3 md:p-0 transition-all duration-300 overflow-hidden ${
             showRightSidebar ? 'flex' : 'hidden md:flex'
           }`}
         >
-          <div className="flex md:hidden justify-between items-center mb-3">
-            <span className="text-xs font-bold text-gray-400">Drawer Tools</span>
+          <div className="flex md:hidden justify-between items-center mb-3 shrink-0">
+            <span className="text-xs font-bold text-gray-300">Chat & painters</span>
             <button
               onClick={() => setShowRightSidebar(false)}
               className="text-xs font-bold text-[#F7C7CB] bg-[#7A0C22] border border-[#523838] px-3 py-1.5 rounded-xl active:scale-95 cursor-pointer"

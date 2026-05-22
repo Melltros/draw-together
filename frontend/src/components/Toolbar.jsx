@@ -29,7 +29,7 @@ export const Toolbar = ({
   ];
 
   return (
-    <div className="flex flex-col gap-2 w-64 select-none animate-slide-in-right">
+    <div className="flex flex-col gap-2 w-[min(100vw-2rem,16rem)] md:w-64 select-none animate-slide-in-right">
       {/* Tools */}
       <div className="pinterest-panel rounded-2xl p-3">
         <div className="flex items-center justify-between mb-2.5 px-1">
