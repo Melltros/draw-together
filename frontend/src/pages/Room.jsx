@@ -448,11 +448,12 @@ export const Room = () => {
 
         {/* RIGHT WORKSPACE BAR (User profiles list + chat panels) */}
         <div 
-          className={`flex-col shrink-0 w-80 h-[calc(100%-2rem)] md:h-full min-h-0 z-30 absolute md:relative top-16 md:top-0 right-4 md:right-0 bg-[#2A1B1B] md:bg-transparent border border-dark-border md:border-0 rounded-2xl md:rounded-none shadow-2xl md:shadow-none p-4 md:p-0 transition-all duration-300 ${
+          className={`flex-col shrink-0 w-full md:w-80 h-full min-h-0 z-30 absolute md:relative top-0 md:top-0 right-0 md:right-0 left-0 sm:left-auto md:left-auto bg-[#2A1B1B] md:bg-transparent border-l border-dark-border md:border-0 p-3 md:p-0 transition-all duration-300 ${
             showRightSidebar ? 'flex' : 'hidden md:flex'
           }`}
         >
-          <div className="flex md:hidden justify-end mb-2">
+          <div className="flex md:hidden justify-between items-center mb-3">
+            <span className="text-xs font-bold text-gray-400">Drawer Tools</span>
             <button
               onClick={() => setShowRightSidebar(false)}
               className="text-xs font-bold text-[#F7C7CB] bg-[#7A0C22] border border-[#523838] px-3 py-1.5 rounded-xl active:scale-95 cursor-pointer"
