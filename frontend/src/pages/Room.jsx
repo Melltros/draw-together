@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSocket } from '../hooks/useSocket';
 import { Toolbar } from '../components/Toolbar';
@@ -52,6 +52,22 @@ export const Room = () => {
   const [selectedSticker, setSelectedSticker] = useState(null);
   const [placementMode, setPlacementMode] = useState(false);
   const [mobileTab, setMobileTab] = useState('canvas');
+  const headerRef = useRef(null);
+
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return undefined;
+    const sync = () => {
+      document.documentElement.style.setProperty('--room-header-height', `${el.offsetHeight}px`);
+    };
+    sync();
+    const ro = new ResizeObserver(sync);
+    ro.observe(el);
+    return () => {
+      ro.disconnect();
+      document.documentElement.style.removeProperty('--room-header-height');
+    };
+  }, [roomExistsChecked]);
 
   // Custom tool changer that auto-collapses left sidebar on mobile screen
   const handleActiveToolChange = (tool) => {
@@ -327,7 +343,10 @@ export const Room = () => {
       )}
 
       {/* Top bar */}
-      <header className="h-auto min-h-14 pinterest-panel border-b border-dark-border px-3 sm:px-5 py-2 flex items-center justify-between gap-2 shrink-0 select-none">
+      <header
+        ref={headerRef}
+        className="room-header h-auto min-h-14 pinterest-panel border-b border-dark-border px-3 sm:px-5 py-2 flex items-center justify-between gap-2 shrink-0 select-none"
+      >
         <div className="flex items-center gap-2 min-w-0">
           <button
             onClick={() => navigate('/')}
@@ -395,7 +414,7 @@ export const Room = () => {
       </div>
 
       {/* 2. MAIN DASHBOARD CONTENT AREA */}
-      <div className="flex-1 flex overflow-hidden min-h-0 relative p-1 max-md:p-1 md:p-4 gap-2 md:gap-4 max-md:pb-[calc(var(--mobile-dock-height,6.5rem)+env(safe-area-inset-bottom,0px))] md:pb-4">
+      <div className="flex-1 flex overflow-hidden min-h-0 relative p-1.5 md:p-4 gap-2 md:gap-4 max-md:pb-[calc(var(--mobile-dock-height,9rem)+env(safe-area-inset-bottom,0px))] md:pb-4">
         {/* Desktop: left toolbar */}
         <div className="hidden md:flex flex-col shrink-0 gap-3 select-none">
           <Toolbar
@@ -413,7 +432,7 @@ export const Room = () => {
         </div>
 
         {/* MIDDLE WORKSPACE (Main painting canvas overlay) */}
-        <div className="flex-1 min-h-0 min-w-0 relative flex flex-col gap-2 md:gap-4 max-md:flex-1">
+        <div className="mobile-canvas-slot flex-1 min-h-0 min-w-0 relative flex flex-col gap-2 md:gap-4">
           <Canvas
             strokes={strokes}
             setStrokes={setStrokes}
@@ -555,6 +574,8 @@ export const Room = () => {
         setActiveTool={handleActiveToolChange}
         color={color}
         setColor={setColor}
+        brushSize={brushSize}
+        setBrushSize={setBrushSize}
         onUndo={handleLocalUndo}
         onRedo={handleLocalRedo}
         onClear={handleLocalClear}
@@ -562,6 +583,8 @@ export const Room = () => {
         canUndo={undoStack.length > 0}
         canRedo={redoStack.length > 0}
         canClear={strokes.length > 0}
+        isConnected={isConnected}
+        roomId={formattedRoomId}
         hasChat={chatMessages.length > 0}
         visible={!placementMode}
       />

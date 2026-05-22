@@ -32,7 +32,8 @@
   --color-text-muted: #a1a1aa;
   --color-canvas-bg: #121216;
   --mobile-dock-base: 4.25rem;
-  --mobile-dock-height: 6.5rem;
+  --mobile-dock-height: 9rem;
+  --room-header-height: 3.75rem;
 }
 
 @layer utilities {
@@ -44,7 +45,7 @@
     background-size: 20px 20px;
   }
 
-  /* Square canvas — sized by JS (min of width/height) for reliable mobile support */
+  /* Square canvas — JS sizing; explicit height for old WebViews (Instagram, etc.) */
   .canvas-stage-host {
     flex: 1 1 0;
     min-height: 0;
@@ -55,6 +56,29 @@
     justify-content: center;
     padding: 0.375rem;
     overflow: hidden;
+  }
+
+  @media (max-width: 767px) {
+    .mobile-canvas-slot {
+      flex: 1 1 auto;
+      min-height: 0;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .canvas-stage-host {
+      flex: 1 1 auto;
+      width: 100%;
+      min-height: calc(
+        100dvh - var(--room-header-height, 3.75rem) - var(--mobile-dock-height, 9rem) -
+          env(safe-area-inset-bottom, 0px) - 0.75rem
+      );
+      height: calc(
+        100dvh - var(--room-header-height, 3.75rem) - var(--mobile-dock-height, 9rem) -
+          env(safe-area-inset-bottom, 0px) - 0.75rem
+      );
+    }
   }
 
   @media (min-width: 768px) {
@@ -72,6 +96,8 @@
     position: relative;
     flex-shrink: 0;
     aspect-ratio: 1 / 1;
+    min-width: 140px;
+    min-height: 140px;
     border-radius: 0.75rem;
     overflow: hidden;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);

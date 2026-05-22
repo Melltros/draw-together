@@ -3,6 +3,7 @@ import { MousePointer } from 'lucide-react';
 import { drawStroke, STROKE_TOOLS } from '../utils/drawStroke';
 import { createFillPatch } from '../utils/canvasFill';
 import { CANVAS_SIZE } from '../constants/canvas';
+import { getMobileCanvasSide } from '../utils/canvasLayout';
 import { StickerPlacementBar } from './StickerPlacementBar';
 
 const CANVAS_WIDTH = CANVAS_SIZE;
@@ -147,24 +148,41 @@ export const Canvas = ({
     if (!host) return undefined;
 
     const fitSquare = () => {
-      const pad = 12;
-      const w = host.clientWidth - pad;
-      const h = host.clientHeight - pad;
-      if (w <= 0 || h <= 0) return;
-      const side = Math.floor(Math.min(w, h));
+      const isMobile = window.matchMedia('(max-width: 767px)').matches;
+      let side;
+      if (isMobile) {
+        side = getMobileCanvasSide(host.clientWidth, host.clientHeight);
+      } else {
+        const pad = 12;
+        const w = host.clientWidth - pad;
+        const h = host.clientHeight - pad;
+        if (w <= 0 || h <= 0) return;
+        side = Math.floor(Math.min(w, h));
+      }
       setSquarePx((prev) => (prev === side ? prev : side));
     };
 
     fitSquare();
+    requestAnimationFrame(fitSquare);
     const ro = new ResizeObserver(() => {
       fitSquare();
       redrawCanvasRef.current();
     });
     ro.observe(host);
+    window.addEventListener('resize', fitSquare);
     window.addEventListener('orientationchange', fitSquare);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', fitSquare);
+      window.visualViewport.addEventListener('scroll', fitSquare);
+    }
     return () => {
       ro.disconnect();
+      window.removeEventListener('resize', fitSquare);
       window.removeEventListener('orientationchange', fitSquare);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', fitSquare);
+        window.visualViewport.removeEventListener('scroll', fitSquare);
+      }
     };
   }, []);
 
