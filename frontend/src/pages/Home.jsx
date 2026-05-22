@@ -30,9 +30,9 @@ export const Home = () => {
       if (!res.ok) throw new Error('Server error');
       const data = await res.json();
 
-      // Epic confetti burst
+      // Epic custom brand palette confetti burst
       const end = Date.now() + 600;
-      const colors = ['#7C3AED', '#EC4899', '#3B82F6', '#06B6D4', '#84CC16'];
+      const colors = ['#70000E', '#C3B79D', '#DCD7D4', '#F5F4F2'];
       (function frame() {
         confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors });
         confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors });
@@ -57,22 +57,22 @@ export const Home = () => {
   };
 
   const features = [
-    { icon: Palette, title: 'Draw Freely', desc: 'Pen, shapes, text & eraser tools', color: '#7C3AED' },
-    { icon: Users, title: 'Real-time Collab', desc: 'See live cursors & strokes instantly', color: '#EC4899' },
-    { icon: MessageSquare, title: 'Built-in Chat', desc: 'Talk while you create together', color: '#3B82F6' },
-    { icon: Download, title: 'Export PNG', desc: 'Download your masterpiece anytime', color: '#06B6D4' },
-    { icon: Shield, title: 'No Sign-up', desc: 'Jump in instantly, zero friction', color: '#84CC16' },
-    { icon: Zap, title: 'Lightning Fast', desc: 'WebSocket-powered sync engine', color: '#F59E0B' },
+    { icon: Palette, title: 'Draw Freely', desc: 'Pen, shapes, text & eraser tools', color: '#70000E' },
+    { icon: Users, title: 'Real-time Collab', desc: 'See live cursors & strokes instantly', color: '#C3B79D' },
+    { icon: MessageSquare, title: 'Built-in Chat', desc: 'Talk while you create together', color: '#DCD7D4' },
+    { icon: Download, title: 'Export PNG', desc: 'Download your masterpiece anytime', color: '#F5F4F2' },
+    { icon: Shield, title: 'No Sign-up', desc: 'Jump in instantly, zero friction', color: '#C3B79D' },
+    { icon: Zap, title: 'Lightning Fast', desc: 'WebSocket-powered sync engine', color: '#70000E' },
   ];
 
   return (
-    <div className="min-h-screen w-screen bg-dark-bg relative overflow-hidden">
-      {/* Animated background orbs */}
+    <div className="min-h-screen w-screen bg-[#030303] relative overflow-hidden">
+      {/* Animated background orbs using brand ruby and cream colors */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="orb-1 absolute -top-32 -left-32 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl" />
-        <div className="orb-2 absolute top-1/3 -right-24 w-80 h-80 bg-pink-600/10 rounded-full blur-3xl" />
-        <div className="orb-3 absolute -bottom-40 left-1/3 w-96 h-96 bg-blue-600/8 rounded-full blur-3xl" />
-        <div className="orb-2 absolute top-1/4 left-1/4 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl" />
+        <div className="orb-1 absolute -top-32 -left-32 w-96 h-96 bg-[#70000E]/15 rounded-full blur-3xl" />
+        <div className="orb-2 absolute top-1/3 -right-24 w-80 h-80 bg-[#C3B79D]/10 rounded-full blur-3xl" />
+        <div className="orb-3 absolute -bottom-40 left-1/3 w-96 h-96 bg-[#70000E]/8 rounded-full blur-3xl" />
+        <div className="orb-2 absolute top-1/4 left-1/4 w-64 h-64 bg-[#C3B79D]/5 rounded-full blur-3xl" />
       </div>
 
       {/* Subtle noise texture */}
@@ -83,22 +83,22 @@ export const Home = () => {
         
         {/* Top badge */}
         <div className={`transition-all duration-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-blue-500/10 border border-purple-500/20 mb-8">
-            <Stars size={14} className="text-purple-400 animate-pulse" />
-            <span className="text-xs font-semibold text-purple-300 tracking-wide">Built by Melltros</span>
-            <span className="text-[10px] font-bold bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full">✦</span>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#70000E]/10 via-[#C3B79D]/10 to-[#DCD7D4]/10 border border-[#70000E]/20 mb-8">
+            <Stars size={14} className="text-[#C3B79D] animate-pulse" />
+            <span className="text-xs font-semibold text-[#DCD7D4] tracking-wide">✦ Built by Melltros ✦</span>
+            <span className="text-[10px] font-bold bg-[#70000E]/20 text-[#C3B79D] px-2 py-0.5 rounded-full">Pro</span>
           </div>
         </div>
 
         {/* Main heading */}
         <div className={`text-center mb-8 transition-all duration-700 delay-100 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          <h1 className="text-5xl sm:text-7xl font-black tracking-tight mb-4 leading-none">
+          <h1 className="text-5xl sm:text-7xl font-black tracking-tight mb-4 leading-none select-none">
             <span className="gradient-text">Paint</span>
             <span className="text-white">Sync</span>
           </h1>
-          <p className="text-gray-400 text-sm sm:text-base max-w-md mx-auto font-medium leading-relaxed">
+          <p className="text-[#DCD7D4]/80 text-sm sm:text-base max-w-md mx-auto font-medium leading-relaxed">
             Create, collaborate, and vibe together on a shared canvas.
-            <span className="text-purple-400"> No sign-up needed.</span>
+            <span className="text-[#C3B79D]"> No registration needed.</span>
           </p>
         </div>
 
@@ -115,7 +115,7 @@ export const Home = () => {
                 disabled={isCreating}
                 className="w-full group relative flex items-center justify-center gap-3 py-4 rounded-2xl font-bold text-white text-sm overflow-hidden transition-all duration-300 active:scale-[0.97] disabled:opacity-60 disabled:cursor-not-allowed btn-glow"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 animate-gradient" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#70000E] via-[#C3B79D] to-[#DCD7D4] animate-gradient" />
                 <div className="relative flex items-center gap-3">
                   {isCreating ? (
                     <>
@@ -147,7 +147,7 @@ export const Home = () => {
                   onChange={(e) => setRoomIdInput(e.target.value.toUpperCase())}
                   placeholder="Enter Room Code"
                   maxLength={6}
-                  className="flex-1 glass-input px-4 py-3.5 text-sm font-bold text-center tracking-[0.3em] uppercase placeholder:tracking-normal placeholder:text-gray-500 placeholder:font-normal"
+                  className="flex-1 glass-input bg-[#1C1919] px-4 py-3.5 text-sm font-bold text-center tracking-[0.3em] uppercase placeholder:tracking-normal placeholder:text-gray-500 placeholder:font-normal"
                 />
                 <button
                   type="submit"
@@ -200,7 +200,7 @@ export const Home = () => {
             Zero Friction • Real-time • No Registration
           </div>
           <div className="flex items-center gap-2 text-xs font-bold">
-            <span className="gradient-text">✦ Made by Melltros ✦</span>
+            <span className="gradient-text">✦ Built by Melltros ✦</span>
           </div>
         </div>
       </div>

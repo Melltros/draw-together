@@ -43,7 +43,7 @@ export const Room = () => {
 
   // Drawing config states
   const [activeTool, setActiveTool] = useState('pen'); // 'pen', 'eraser', 'line', 'rect', 'circle', 'text'
-  const [color, setColor] = useState('#7C3AED');
+  const [color, setColor] = useState('#70000E');
   const [brushSize, setBrushSize] = useState(5);
   
   // Custom tool changer that auto-collapses left sidebar on mobile screen

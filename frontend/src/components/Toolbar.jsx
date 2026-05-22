@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Pencil, Eraser, Minus, Square, Circle, Type, Palette, Smile, ChevronDown, ChevronUp } from 'lucide-react';
+import { Pencil, Eraser, Minus, Square, Circle, Type, Smile, ChevronDown, ChevronUp } from 'lucide-react';
 
 const PRESET_COLORS = [
-  '#7C3AED', '#EC4899', '#3B82F6', '#06B6D4', '#10B981',
-  '#84CC16', '#F59E0B', '#EF4444', '#F97316', '#FFFFFF'
+  '#70000E', '#C3B79D', '#DCD7D4', '#F5F4F2', '#E11D48',
+  '#2563EB', '#16A34A', '#D97706', '#EA580C', '#FFFFFF'
 ];
 
-const EMOJI_STAMPS = ['⭐', '❤️', '🔥', '✨', '💀', '👀', '🎨', '💜', '🌈', '😎', '🦋', '🍄'];
+const EMOJI_STAMPS = ['⭐', '❤️', '🔥', '✨', '💀', '👀', '🎨', '🖤', '🌈', '😎', '🦋', '🍄'];
 
 export const Toolbar = ({
   activeTool,
@@ -16,8 +16,8 @@ export const Toolbar = ({
   brushSize,
   setBrushSize
 }) => {
-  const [showColorPicker, setShowColorPicker] = useState(false);
-  const [showEmojis, setShowEmojis] = useState(false);
+  const [showColorPicker, setShowColorPicker] = useState(true);
+  const [showEmojis, setShowEmojis] = useState(true);
 
   const tools = [
     { id: 'pen', icon: Pencil, label: 'Pen', shortcut: 'P' },
@@ -34,7 +34,7 @@ export const Toolbar = ({
       <div className="glass-panel rounded-2xl p-3 shadow-glow-primary">
         <div className="flex items-center justify-between mb-2.5 px-1">
           <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Tools</span>
-          <span className="text-[9px] font-bold text-purple-400/60 bg-purple-500/10 px-1.5 py-0.5 rounded">
+          <span className="text-[9px] font-bold text-accent-cream bg-accent/15 px-1.5 py-0.5 rounded">
             {tools.find(t => t.id === activeTool)?.label || 'Pen'}
           </span>
         </div>
@@ -49,7 +49,7 @@ export const Toolbar = ({
                 title={`${tool.label} (${tool.shortcut})`}
                 className={`relative flex flex-col items-center justify-center p-2.5 rounded-xl transition-all duration-200 group ${
                   isActive
-                    ? 'bg-gradient-to-br from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/20 scale-[1.03]'
+                    ? 'bg-gradient-to-br from-accent to-accent-cream text-white shadow-lg shadow-accent/20 scale-[1.03]'
                     : 'bg-dark-card hover:bg-dark-hover text-gray-400 hover:text-white'
                 }`}
               >
@@ -126,7 +126,7 @@ export const Toolbar = ({
       <div className="glass-panel rounded-2xl p-3">
         <div className="flex items-center justify-between mb-2 px-1">
           <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Size</span>
-          <span className="text-[10px] font-bold text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded-md">
+          <span className="text-[10px] font-bold text-accent-cream bg-accent/15 px-2 py-0.5 rounded-md">
             {brushSize}px
           </span>
         </div>
@@ -161,7 +161,7 @@ export const Toolbar = ({
           className="flex items-center justify-between w-full px-1 group"
         >
           <div className="flex items-center gap-2">
-            <Smile size={14} className="text-yellow-400" />
+            <Smile size={14} className="text-accent-cream" />
             <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Stickers</span>
           </div>
           {showEmojis ? <ChevronUp size={12} className="text-gray-500" /> : <ChevronDown size={12} className="text-gray-500" />}
@@ -174,10 +174,9 @@ export const Toolbar = ({
                 key={emoji}
                 onClick={() => {
                   setActiveTool('text');
-                  // Store selected emoji in a custom event for Canvas to pick up
                   window.selectedEmoji = emoji;
                 }}
-                className="flex items-center justify-center p-2 text-lg rounded-lg bg-dark-card hover:bg-dark-hover hover:scale-110 transition-all duration-150 active:scale-95"
+                className="flex items-center justify-center p-2 text-lg rounded-lg bg-dark-card hover:bg-dark-hover hover:scale-110 transition-all duration-150 active:scale-95 cursor-pointer"
               >
                 {emoji}
               </button>
