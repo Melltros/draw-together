@@ -7,7 +7,7 @@ export const UserList = ({ activeUsers = [], selfUserId, compact = false }) => {
       <div className="shrink-0 px-3 py-2 border-b border-[#523838]/50 bg-[#352323]/80">
         <div className="flex items-center gap-2 overflow-x-auto touch-scrollable pb-0.5">
           <div className="flex items-center gap-1 shrink-0 pr-1">
-            <Users size={12} className="text-[#C73543]" />
+            <Users size={12} className="text-accent" />
             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
               {activeUsers.length} online
             </span>
@@ -22,7 +22,7 @@ export const UserList = ({ activeUsers = [], selfUserId, compact = false }) => {
                 <div
                   key={user.userId}
                   className={`flex items-center gap-1.5 shrink-0 pl-1 pr-2.5 py-1 rounded-full border ${
-                    isSelf ? 'bg-[#7A0C22]/40 border-[#C73543]/50' : 'bg-[#452F2F] border-[#523838]'
+                    isSelf ? 'bg-dark-hover/40 border-accent/50' : 'bg-dark-card border-dark-border'
                   }`}
                   title={user.username}
                 >
@@ -49,8 +49,8 @@ export const UserList = ({ activeUsers = [], selfUserId, compact = false }) => {
     <div className="pinterest-panel rounded-2xl p-4 mb-3 shrink-0 animate-slide-in-right">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-[#C73543]/15 flex items-center justify-center">
-            <Users size={14} className="text-[#C73543]" />
+          <div className="w-7 h-7 rounded-lg bg-primary-soft/15 flex items-center justify-center">
+            <Users size={14} className="text-accent" />
           </div>
           <div>
             <h3 className="text-xs font-bold text-gray-200">Who&apos;s here</h3>
@@ -77,7 +77,7 @@ export const UserList = ({ activeUsers = [], selfUserId, compact = false }) => {
                 key={user.userId}
                 className={`flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-200 border ${
                   isSelf
-                    ? 'bg-[#7A0C22]/30 border-[#C73543]/50'
+                    ? 'bg-dark-hover/30 border-accent/50'
                     : 'bg-dark-card border-dark-border hover:bg-dark-hover'
                 }`}
               >
@@ -88,14 +88,14 @@ export const UserList = ({ activeUsers = [], selfUserId, compact = false }) => {
                   >
                     {initials}
                   </div>
-                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#2A1B1B]" />
+                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-dark-bg" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5">
                     <span className="text-xs font-bold text-gray-200 truncate">{user.username}</span>
                     {index === 0 && <Crown size={10} className="text-yellow-400 shrink-0" />}
                     {isSelf && (
-                      <span className="text-[8px] font-bold text-[#F7C7CB] bg-[#7A0C22] px-1.5 py-0.5 rounded-full shrink-0">
+                      <span className="text-[8px] font-bold text-[#F7C7CB] bg-dark-hover px-1.5 py-0.5 rounded-full shrink-0">
                         You
                       </span>
                     )}

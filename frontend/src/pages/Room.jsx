@@ -259,14 +259,14 @@ export const Room = () => {
     return (
       <div className="min-h-dvh flex items-center justify-center bg-dark-bg text-center p-4 overflow-hidden">
         <div className="relative w-full max-w-md pinterest-panel p-8 rounded-3xl animate-scale-in">
-          <div className="w-16 h-16 bg-[#C73543]/15 rounded-2xl flex items-center justify-center mx-auto mb-5">
-            <Globe size={28} className="text-[#C73543]" />
+          <div className="w-16 h-16 bg-primary-soft rounded-2xl flex items-center justify-center mx-auto mb-5">
+            <Globe size={28} className="text-accent" />
           </div>
           <h2 className="text-xl font-bold text-gray-100 mb-2">Room not found</h2>
           <p className="text-sm text-gray-400 mb-6 font-medium">{roomCheckingError}</p>
           <button
             onClick={() => navigate('/')}
-            className="w-full py-3.5 bg-[#C73543] hover:bg-[#7A0C22] rounded-2xl font-bold text-sm text-white transition-all duration-200 active:scale-95 cursor-pointer"
+            className="w-full py-3.5 btn-primary  rounded-2xl font-bold text-sm text-white transition-all duration-200 active:scale-95 cursor-pointer"
           >
             Go to homepage
           </button>
@@ -279,8 +279,8 @@ export const Room = () => {
     return (
       <div className="min-h-dvh flex flex-col items-center justify-center bg-dark-bg text-center gap-4 overflow-hidden">
         <div className="relative">
-          <div className="w-16 h-16 rounded-2xl bg-[#C73543]/15 flex items-center justify-center mb-4 mx-auto">
-            <Loader2 size={28} className="text-[#C73543] animate-spin" />
+          <div className="w-16 h-16 rounded-2xl bg-primary-soft flex items-center justify-center mb-4 mx-auto">
+            <Loader2 size={28} className="text-accent animate-spin" />
           </div>
           <span className="text-sm font-bold text-gray-300">Opening room…</span>
           <p className="ux-hint mt-1">Connecting you to the shared canvas</p>
@@ -312,7 +312,7 @@ export const Room = () => {
       )}
 
       {!isConnected && roomExistsChecked && (
-        <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-[#C73543]/95 text-white text-xs font-bold shadow-lg">
+        <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-accent/95 text-white text-xs font-bold shadow-lg">
           Connection lost — trying to reconnect…
         </div>
       )}
@@ -356,15 +356,15 @@ export const Room = () => {
             className={`hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-lg border text-[10px] font-bold ${
               isConnected
                 ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
-                : 'bg-[#C73543]/10 border-[#C73543]/30 text-[#F7C7CB]'
+                : 'bg-primary-soft border-primary-soft text-accent-pink'
             }`}
           >
-            <span className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-emerald-400' : 'bg-[#C73543] animate-pulse'}`} />
+            <span className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-emerald-400' : 'bg-accent animate-pulse'}`} />
             {isConnected ? 'Connected' : 'Connecting…'}
           </div>
 
           {username && (
-            <div className="hidden md:flex items-center gap-1.5 bg-[#452F2F] border border-dark-border rounded-xl py-1 px-2">
+            <div className="hidden md:flex items-center gap-1.5 bg-dark-card border border-dark-border rounded-xl py-1 px-2">
               <div
                 className="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-black text-white"
                 style={{ backgroundColor: userColor }}
@@ -377,7 +377,7 @@ export const Room = () => {
 
           <button
             onClick={handleCopyLink}
-            className="flex items-center gap-1.5 text-xs font-bold text-white bg-[#C73543] hover:bg-[#7A0C22] px-3 py-2 rounded-xl active:scale-95 cursor-pointer"
+            className="flex items-center gap-1.5 text-xs font-bold text-white btn-primary  px-3 py-2 rounded-xl active:scale-95 cursor-pointer"
             title="Copy link to invite friends"
           >
             {copiedLink ? <Check size={14} /> : <Link2 size={14} />}
@@ -388,9 +388,9 @@ export const Room = () => {
 
       {/* Desktop: where things are */}
       <div className="hidden md:flex items-center justify-center gap-6 px-4 py-1.5 bg-[#352323]/40 border-b border-[#523838]/40 text-[11px] font-medium text-gray-400 shrink-0">
-        <span className="flex items-center gap-1.5"><Palette size={12} className="text-[#C73543]" /> Tools on the left</span>
-        <span className="flex items-center gap-1.5"><Pencil size={12} className="text-[#F7C7CB]" /> Draw in the center</span>
-        <span className="flex items-center gap-1.5"><MessageSquare size={12} className="text-[#C73543]" /> Chat on the right</span>
+        <span className="flex items-center gap-1.5"><Palette size={12} className="text-accent" /> Tools on the left</span>
+        <span className="flex items-center gap-1.5"><Pencil size={12} className="text-accent-pink" /> Draw in the center</span>
+        <span className="flex items-center gap-1.5"><MessageSquare size={12} className="text-accent" /> Chat on the right</span>
         <span className="flex items-center gap-1.5"><Users size={12} /> {activeUsers.length} here now</span>
       </div>
 
@@ -413,7 +413,7 @@ export const Room = () => {
         </div>
 
         {/* MIDDLE WORKSPACE (Main painting canvas overlay) */}
-        <div className="flex-1 h-full min-w-0 relative flex flex-col gap-2 md:gap-4">
+        <div className="flex-1 min-h-0 min-w-0 relative flex flex-col gap-2 md:gap-4">
           <Canvas
             strokes={strokes}
             setStrokes={setStrokes}
@@ -462,7 +462,7 @@ export const Room = () => {
               onClick={handleLocalClear}
               disabled={strokes.length === 0}
               aria-label="Clear entire canvas"
-              className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 px-2 py-1.5 text-[#F7C7CB] border border-[#523838] hover:bg-[#7A0C22]/25 rounded-xl text-[10px] font-bold active:scale-95 disabled:opacity-25 cursor-pointer"
+              className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 px-2 py-1.5 text-accent-pink border border-dark-border hover:bg-primary-soft rounded-xl text-[10px] font-bold active:scale-95 disabled:opacity-25 cursor-pointer"
             >
               <Trash2 size={14} />
               <span>Clear all</span>
@@ -471,7 +471,7 @@ export const Room = () => {
             <button
               onClick={handleDownload}
               aria-label="Save drawing as PNG"
-              className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 px-3 py-1.5 bg-[#C73543] hover:bg-[#7A0C22] text-white rounded-xl text-[10px] font-bold active:scale-95 cursor-pointer"
+              className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 px-3 py-1.5 btn-primary  text-white rounded-xl text-[10px] font-bold active:scale-95 cursor-pointer"
             >
               <Download size={14} />
               <span>Save PNG</span>
@@ -492,7 +492,7 @@ export const Room = () => {
           <div className="shrink-0 flex items-center justify-between px-4 py-3 border-b border-[#523838] bg-[#352323]">
             <div>
               <div className="flex items-center gap-2">
-                <MessageSquare size={16} className="text-[#C73543]" />
+                <MessageSquare size={16} className="text-accent" />
                 <span className="text-sm font-bold text-white">Group chat</span>
               </div>
               <p className="ux-hint mt-0.5 ml-6">Back to canvas when you&apos;re done</p>
@@ -500,7 +500,7 @@ export const Room = () => {
             <button
               type="button"
               onClick={() => setShowRightSidebar(false)}
-              className="text-xs font-bold text-white bg-[#C73543] hover:bg-[#7A0C22] px-4 py-2.5 rounded-xl active:scale-95 cursor-pointer"
+              className="text-xs font-bold text-white btn-primary  px-4 py-2.5 rounded-xl active:scale-95 cursor-pointer"
             >
               ← Canvas
             </button>
@@ -525,7 +525,7 @@ export const Room = () => {
               <button
                 type="button"
                 onClick={() => setShowLeftSidebar(false)}
-                className="text-xs font-bold text-white bg-[#C73543] px-3 py-2 rounded-xl active:scale-95 cursor-pointer shrink-0"
+                className="text-xs font-bold text-white btn-primary px-3 py-2 rounded-xl active:scale-95 cursor-pointer shrink-0"
               >
                 ← Canvas
               </button>
@@ -574,7 +574,7 @@ export const Room = () => {
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
           <div className="relative w-full max-w-sm mx-4 pinterest-panel p-8 rounded-3xl text-center animate-scale-in">
-            <div className="w-14 h-14 bg-[#C73543]/15 text-[#C73543] rounded-2xl flex items-center justify-center mx-auto mb-5">
+            <div className="w-14 h-14 bg-primary-soft text-accent rounded-2xl flex items-center justify-center mx-auto mb-5">
               <Palette size={24} />
             </div>
             
@@ -603,7 +603,7 @@ export const Room = () => {
               <button
                 type="submit"
                 disabled={!modalInput.trim()}
-                className="w-full py-3.5 bg-[#C73543] hover:bg-[#7A0C22] text-white font-bold text-base rounded-2xl active:scale-[0.97] transition-all disabled:opacity-40 cursor-pointer"
+                className="w-full py-3.5 btn-primary  text-white font-bold text-base rounded-2xl active:scale-[0.97] transition-all disabled:opacity-40 cursor-pointer"
               >
                 Enter the room
               </button>

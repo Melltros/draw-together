@@ -43,7 +43,7 @@ export const Home = () => {
       const data = await res.json();
 
       const end = Date.now() + 500;
-      const colors = ['#ff6b5b', '#ff8a7a', '#ffc9c1', '#f8fafc'];
+      const colors = ['#a78bfa', '#c4b5fd', '#ddd6fe', '#f4f4f5'];
       (function frame() {
         confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors });
         confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors });
@@ -77,7 +77,7 @@ export const Home = () => {
   return (
     <div className="page-scroll relative" style={{ backgroundColor: 'var(--color-bg)' }}>
       <div className="pointer-events-none fixed inset-0 overflow-hidden -z-0" aria-hidden>
-        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[min(90vw,520px)] h-[320px] rounded-full bg-[#ff6b5b]/20 blur-[100px]" />
+        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[min(90vw,520px)] h-[320px] rounded-full bg-accent/20 blur-[100px]" />
         <div className="absolute bottom-0 right-0 w-72 h-72 rounded-full bg-[#3b82f6]/10 blur-[80px]" />
       </div>
 
@@ -197,7 +197,7 @@ export const Home = () => {
                 const Icon = feat.icon;
                 return (
                   <div key={feat.title} className="pinterest-card rounded-2xl p-4">
-                    <Icon size={20} className="text-[#C73543] mb-2" />
+                    <Icon size={20} className="text-accent mb-2" />
                     <h3 className="text-sm font-bold text-white mb-1">{feat.title}</h3>
                     <p className="ux-hint">{feat.desc}</p>
                   </div>

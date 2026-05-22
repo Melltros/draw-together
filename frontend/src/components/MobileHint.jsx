@@ -15,7 +15,7 @@ export const MobileHint = () => {
 
   return (
     <div className="md:hidden fixed left-3 right-3 bottom-[calc(9rem+env(safe-area-inset-bottom,0px))] z-[35] animate-slide-up">
-      <div className="pinterest-panel rounded-2xl p-4 shadow-2xl border-[#C73543]/30">
+      <div className="pinterest-panel rounded-2xl p-4 shadow-2xl border-primary-soft">
         <div className="flex items-start justify-between gap-2 mb-3">
           <p className="text-sm font-bold text-white">Quick guide</p>
           <button
@@ -29,20 +29,20 @@ export const MobileHint = () => {
         </div>
         <ul className="space-y-2.5 text-xs text-gray-300 font-medium">
           <li className="flex items-center gap-2.5">
-            <span className="w-8 h-8 rounded-lg bg-[#C73543]/20 flex items-center justify-center shrink-0">
-              <Palette size={14} className="text-[#C73543]" />
+            <span className="w-8 h-8 rounded-lg bg-primary-soft/20 flex items-center justify-center shrink-0">
+              <Palette size={14} className="text-accent" />
             </span>
             <span><strong className="text-white">Tools</strong> — swipe colors, glow pen & stickers</span>
           </li>
           <li className="flex items-center gap-2.5">
-            <span className="w-8 h-8 rounded-lg bg-[#C73543]/20 flex items-center justify-center shrink-0">
+            <span className="w-8 h-8 rounded-lg bg-primary-soft/20 flex items-center justify-center shrink-0">
               <Pencil size={14} className="text-[#F7C7CB]" />
             </span>
             <span><strong className="text-white">Canvas</strong> — draw here (page won&apos;t refresh while you draw)</span>
           </li>
           <li className="flex items-center gap-2.5">
-            <span className="w-8 h-8 rounded-lg bg-[#C73543]/20 flex items-center justify-center shrink-0">
-              <MessageSquare size={14} className="text-[#C73543]" />
+            <span className="w-8 h-8 rounded-lg bg-primary-soft/20 flex items-center justify-center shrink-0">
+              <MessageSquare size={14} className="text-accent" />
             </span>
             <span><strong className="text-white">Chat</strong> — message your friends</span>
           </li>
@@ -50,7 +50,7 @@ export const MobileHint = () => {
         <button
           type="button"
           onClick={dismiss}
-          className="mt-3 w-full py-2.5 bg-[#C73543] hover:bg-[#7A0C22] text-white text-xs font-bold rounded-xl active:scale-[0.98] cursor-pointer"
+          className="mt-3 w-full py-2.5 btn-primary text-white text-xs font-bold rounded-xl active:scale-[0.98] cursor-pointer"
         >
           Got it
         </button>

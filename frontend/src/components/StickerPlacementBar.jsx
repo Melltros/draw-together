@@ -17,7 +17,7 @@ export const StickerPlacementBar = ({
       className="fixed left-0 right-0 z-[45] px-3 pointer-events-auto"
       style={{ bottom: 'calc(11rem + env(safe-area-inset-bottom, 0px))' }}
     >
-      <div className="pinterest-panel rounded-2xl p-3 shadow-2xl border-[#C73543]/40 max-w-lg mx-auto">
+      <div className="pinterest-panel rounded-2xl p-3 shadow-2xl border-primary-soft max-w-lg mx-auto">
         <div className="flex items-center gap-3 mb-3">
           <div className="w-14 h-14 rounded-2xl bg-[#1F1313] border border-[#523838] flex items-center justify-center shrink-0">
             <span style={{ fontSize: `${Math.min(size * 0.35, 40)}px` }} className="leading-none select-none">
@@ -63,7 +63,7 @@ export const StickerPlacementBar = ({
           <button
             type="button"
             onClick={onPlace}
-            className="flex-[1.4] py-3 rounded-xl bg-[#C73543] hover:bg-[#7A0C22] text-white text-sm font-bold flex items-center justify-center gap-1.5 active:scale-[0.98] cursor-pointer"
+            className="flex-[1.4] py-3 rounded-xl btn-primary text-white text-sm font-bold flex items-center justify-center gap-1.5 active:scale-[0.98] cursor-pointer"
           >
             <Check size={16} /> Place sticker
           </button>

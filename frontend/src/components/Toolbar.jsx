@@ -87,7 +87,7 @@ export const Toolbar = ({
                 aria-pressed={activeTool === tool.id}
                 className={`flex flex-col items-center justify-center p-2.5 rounded-xl border cursor-pointer ${
                   activeTool === tool.id
-                    ? 'bg-[#C73543] border-[#7A0C22] text-white ring-2 ring-[#F7C7CB]/40'
+                    ? 'bg-accent border-[var(--color-primary-hover)] text-white ring-2 ring-accent-pink/40'
                     : 'bg-dark-card border-dark-border text-gray-400 hover:text-white'
                 }`}
               >

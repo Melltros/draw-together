@@ -2,44 +2,71 @@
 
 @import "tailwindcss";
 
-/* Slate ink + coral accent — clearer contrast than brown-red */
+/* Studio violet — calm, art-friendly, works on phone & desktop */
 @theme {
-  --color-dark-bg: #0f1419;
-  --color-dark-sidebar: #1a2332;
-  --color-dark-card: #243044;
-  --color-dark-border: #3d4f66;
-  --color-dark-input: #0d1117;
-  --color-dark-hover: #2d3a4f;
+  --color-dark-bg: #16161a;
+  --color-dark-sidebar: #222228;
+  --color-dark-card: #2c2c34;
+  --color-dark-border: #434350;
+  --color-dark-input: #121216;
+  --color-dark-hover: #38383f;
 
-  --color-accent: #ff6b5b;
-  --color-accent-rose: #ff8a7a;
-  --color-accent-pink: #ffc9c1;
-  --color-accent-white: #f8fafc;
+  --color-accent: #a78bfa;
+  --color-accent-rose: #c4b5fd;
+  --color-accent-pink: #ddd6fe;
+  --color-accent-white: #f4f4f5;
 
   --font-sans: 'Outfit', 'Plus Jakarta Sans', 'Inter', sans-serif;
 }
 
 :root {
-  --color-bg: #0f1419;
-  --color-surface: #1a2332;
-  --color-surface-2: #243044;
-  --color-border: #3d4f66;
-  --color-input: #0d1117;
-  --color-primary: #ff6b5b;
-  --color-primary-hover: #e85a4a;
-  --color-accent-soft: #ffc9c1;
-  --color-text: #f1f5f9;
-  --color-text-muted: #94a3b8;
+  --color-bg: #16161a;
+  --color-surface: #222228;
+  --color-surface-2: #2c2c34;
+  --color-border: #434350;
+  --color-input: #121216;
+  --color-primary: #a78bfa;
+  --color-primary-hover: #8b5cf6;
+  --color-accent-soft: #c4b5fd;
+  --color-text: #f4f4f5;
+  --color-text-muted: #a1a1aa;
+  --color-canvas-bg: #121216;
   --mobile-dock-base: 4.25rem;
 }
 
 @layer utilities {
   .canvas-grid-bg {
-    background-color: #0d1117;
+    background-color: var(--color-canvas-bg);
     background-image:
-      linear-gradient(to right, rgba(148, 163, 184, 0.06) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
+      linear-gradient(to right, rgba(167, 139, 250, 0.07) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(167, 139, 250, 0.07) 1px, transparent 1px);
     background-size: 20px 20px;
+  }
+
+  /* Square canvas — same proportions on mobile & desktop */
+  .canvas-stage-host {
+    container-type: size;
+    flex: 1 1 0;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+  }
+
+  .canvas-square {
+    position: relative;
+    width: min(100cqw, 100cqh);
+    height: min(100cqw, 100cqh);
+    max-width: 100%;
+    max-height: 100%;
+    flex-shrink: 0;
+    aspect-ratio: 1 / 1;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
   }
 
   .pinterest-panel {
@@ -65,7 +92,28 @@
 
   .pinterest-input:focus {
     border-color: var(--color-primary);
-    background-color: #151b24;
+    background-color: #1a1a20;
+  }
+
+  .btn-primary {
+    background-color: var(--color-primary);
+    color: #fff;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--color-primary-hover);
+  }
+
+  .text-primary {
+    color: var(--color-primary);
+  }
+
+  .bg-primary-soft {
+    background-color: color-mix(in srgb, var(--color-primary) 18%, transparent);
+  }
+
+  .border-primary-soft {
+    border-color: color-mix(in srgb, var(--color-primary) 35%, transparent);
   }
 
   .animate-slide-up {

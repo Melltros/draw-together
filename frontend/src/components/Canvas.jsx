@@ -392,9 +392,9 @@ export const Canvas = ({
 
       <div
         ref={containerRef}
-        className="draw-surface relative flex-1 h-full w-full bg-[#0D0D12] overflow-hidden rounded-2xl border border-dark-border/40 flex items-center justify-center min-h-0 min-w-0"
+        className="canvas-stage-host flex-1 min-h-0 draw-surface rounded-2xl border border-dark-border/50 bg-[var(--color-canvas-bg)]/80"
       >
-        <div className="relative aspect-square max-w-full max-h-full draw-surface w-full h-full">
+        <div className="canvas-square draw-surface">
           <canvas
             ref={canvasRef}
             width={CANVAS_WIDTH}
@@ -403,7 +403,8 @@ export const Canvas = ({
             onMouseMove={handleMove}
             onMouseUp={handleEnd}
             onMouseLeave={handleEnd}
-            className={`canvas-grid-bg w-full h-full block rounded-2xl shadow-2xl draw-surface ${cursorClass}`}
+            className={`canvas-grid-bg block w-full h-full draw-surface ${cursorClass}`}
+            style={{ touchAction: 'none' }}
           />
 
           {stickerDraft && (
@@ -439,7 +440,7 @@ export const Canvas = ({
 
           {activePlacement?.type === 'text' && (
             <div
-              className="absolute z-40 left-1/2 -translate-x-1/2 bottom-4 w-[min(100%,280px)] pinterest-panel p-4 rounded-2xl shadow-2xl border-[#C73543]/40"
+              className="absolute z-40 left-1/2 -translate-x-1/2 bottom-4 w-[min(100%,280px)] pinterest-panel p-4 rounded-2xl shadow-2xl border-primary-soft"
             >
               <p className="text-xs font-bold text-white mb-2">Add text</p>
               <input
@@ -463,7 +464,7 @@ export const Canvas = ({
                   type="button"
                   onClick={handlePlacementSubmit}
                   disabled={!activePlacement.text.trim()}
-                  className="flex-1 py-2.5 rounded-xl bg-[#C73543] text-sm font-bold text-white disabled:opacity-40 cursor-pointer"
+                  className="flex-1 py-2.5 rounded-xl btn-primary text-sm font-bold disabled:opacity-40 cursor-pointer"
                 >
                   Place text
                 </button>

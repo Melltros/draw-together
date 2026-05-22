@@ -35,7 +35,7 @@ export const StickerPicker = ({
             onClick={() => setCategory(cat.id)}
             className={`shrink-0 px-3 py-1.5 rounded-full text-[10px] font-bold border cursor-pointer transition-all ${
               category === cat.id
-                ? 'bg-[#C73543] border-[#7A0C22] text-white'
+                ? 'bg-accent border-[var(--color-primary-hover)] text-white'
                 : 'bg-dark-card border-dark-border text-gray-400'
             }`}
           >
@@ -56,7 +56,7 @@ export const StickerPicker = ({
                 compact ? 'p-2 text-xl' : 'p-2.5 text-2xl'
               } ${
                 isSelected
-                  ? 'bg-[#C73543]/30 border-[#C73543] ring-2 ring-[#F7C7CB]/40 scale-105'
+                  ? 'bg-accent/30 border-accent ring-2 ring-accent-pink/40 scale-105'
                   : 'bg-dark-card border-dark-border hover:bg-dark-hover'
               }`}
               aria-label={`Sticker ${emoji}`}

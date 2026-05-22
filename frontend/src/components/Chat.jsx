@@ -43,8 +43,8 @@ export const Chat = ({ chatMessages = [], sendMessage, fillHeight = false }) => 
     <div className={`${rootClass} pinterest-panel rounded-2xl md:animate-slide-in-right`}>
       <div className="px-4 py-2.5 border-b border-dark-border/50 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-[#C73543]/15 flex items-center justify-center">
-            <MessageSquare size={14} className="text-[#C73543]" />
+          <div className="w-7 h-7 rounded-lg bg-accent/15 flex items-center justify-center">
+            <MessageSquare size={14} className="text-accent" />
           </div>
           <div>
             <h3 className="text-xs font-bold text-gray-200">Group chat</h3>
@@ -149,7 +149,7 @@ export const Chat = ({ chatMessages = [], sendMessage, fillHeight = false }) => 
               onClick={() => setShowEmojis(!showEmojis)}
               className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 transition-all active:scale-90 cursor-pointer ${
                 showEmojis
-                  ? 'bg-[#C73543]/25 text-[#F7C7CB]'
+                  ? 'bg-accent/25 text-accent-pink'
                   : 'bg-dark-card text-gray-400'
               }`}
               aria-label="Quick emojis"
@@ -169,7 +169,7 @@ export const Chat = ({ chatMessages = [], sendMessage, fillHeight = false }) => 
             <button
               type="submit"
               disabled={!text.trim()}
-              className="w-11 h-11 rounded-xl bg-[#C73543] hover:bg-[#7A0C22] flex items-center justify-center text-white shrink-0 active:scale-90 disabled:opacity-35 cursor-pointer"
+              className="w-11 h-11 rounded-xl bg-accent hover:bg-[var(--color-primary-hover)] flex items-center justify-center text-white shrink-0 active:scale-90 disabled:opacity-35 cursor-pointer"
               aria-label="Send message"
             >
               <Send size={16} />
