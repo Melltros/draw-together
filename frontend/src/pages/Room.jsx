@@ -395,7 +395,7 @@ export const Room = () => {
       </div>
 
       {/* 2. MAIN DASHBOARD CONTENT AREA */}
-      <div className="flex-1 flex overflow-hidden min-h-0 relative p-1.5 md:p-4 gap-2 md:gap-4 max-md:pb-[calc(var(--mobile-dock-height,11rem)+env(safe-area-inset-bottom,0px))] md:pb-4">
+      <div className="flex-1 flex overflow-hidden min-h-0 relative p-1 max-md:p-1 md:p-4 gap-2 md:gap-4 max-md:pb-[calc(var(--mobile-dock-height,6.5rem)+env(safe-area-inset-bottom,0px))] md:pb-4">
         {/* Desktop: left toolbar */}
         <div className="hidden md:flex flex-col shrink-0 gap-3 select-none">
           <Toolbar
@@ -413,7 +413,7 @@ export const Room = () => {
         </div>
 
         {/* MIDDLE WORKSPACE (Main painting canvas overlay) */}
-        <div className="flex-1 min-h-0 min-w-0 relative flex flex-col gap-2 md:gap-4 max-md:min-h-[42dvh]">
+        <div className="flex-1 min-h-0 min-w-0 relative flex flex-col gap-2 md:gap-4 max-md:flex-1">
           <Canvas
             strokes={strokes}
             setStrokes={setStrokes}
@@ -555,8 +555,6 @@ export const Room = () => {
         setActiveTool={handleActiveToolChange}
         color={color}
         setColor={setColor}
-        brushSize={brushSize}
-        setBrushSize={setBrushSize}
         onUndo={handleLocalUndo}
         onRedo={handleLocalRedo}
         onClear={handleLocalClear}
@@ -564,8 +562,6 @@ export const Room = () => {
         canUndo={undoStack.length > 0}
         canRedo={redoStack.length > 0}
         canClear={strokes.length > 0}
-        isConnected={isConnected}
-        roomId={formattedRoomId}
         hasChat={chatMessages.length > 0}
         visible={!placementMode}
       />

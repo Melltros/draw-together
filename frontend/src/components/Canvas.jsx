@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useLayoutEffect, useState, useCallback } from 'react';
 import { MousePointer } from 'lucide-react';
 import { drawStroke, STROKE_TOOLS } from '../utils/drawStroke';
 import { createFillPatch } from '../utils/canvasFill';
@@ -29,6 +29,7 @@ export const Canvas = ({
 }) => {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
+  const [squarePx, setSquarePx] = useState(null);
   const fillImageCache = useRef({});
   const [isDrawing, setIsDrawing] = useState(false);
   const [startPoint, setStartPoint] = useState(null);
@@ -141,12 +142,30 @@ export const Canvas = ({
     redrawCanvas();
   }, [redrawCanvas]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const host = containerRef.current;
     if (!host) return undefined;
-    const ro = new ResizeObserver(() => redrawCanvasRef.current());
+
+    const fitSquare = () => {
+      const pad = 12;
+      const w = host.clientWidth - pad;
+      const h = host.clientHeight - pad;
+      if (w <= 0 || h <= 0) return;
+      const side = Math.floor(Math.min(w, h));
+      setSquarePx((prev) => (prev === side ? prev : side));
+    };
+
+    fitSquare();
+    const ro = new ResizeObserver(() => {
+      fitSquare();
+      redrawCanvasRef.current();
+    });
     ro.observe(host);
-    return () => ro.disconnect();
+    window.addEventListener('orientationchange', fitSquare);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('orientationchange', fitSquare);
+    };
   }, []);
 
   useEffect(() => {
@@ -400,9 +419,16 @@ export const Canvas = ({
 
       <div
         ref={containerRef}
-        className="canvas-stage-host flex-1 min-h-0 draw-surface rounded-2xl border border-dark-border/50 bg-[var(--color-canvas-bg)]/80"
+        className="canvas-stage-host flex-1 min-h-0 draw-surface max-md:rounded-xl md:rounded-2xl border border-dark-border/50 bg-[var(--color-bg)]"
       >
-        <div className="canvas-square draw-surface">
+        <div
+          className="canvas-square draw-surface"
+          style={
+            squarePx
+              ? { width: squarePx, height: squarePx, maxWidth: '100%', maxHeight: '100%' }
+              : undefined
+          }
+        >
           <canvas
             ref={canvasRef}
             width={CANVAS_WIDTH}
