@@ -309,3 +309,25 @@ body.room-mode {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 }
+
+/* Horizontal swipe rows (colors, sticker tabs) — must use pan-x, NOT pan-y */
+.color-strip-scroll,
+.sticker-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+}
+
+.color-strip-scroll::-webkit-scrollbar,
+.sticker-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+.color-strip-scroll::-webkit-scrollbar-thumb,
+.sticker-scroll::-webkit-scrollbar-thumb {
+  background: #523838;
+  border-radius: 4px;
+}

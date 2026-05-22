@@ -12,6 +12,9 @@ export function useRoomBodyLock(active) {
     body.classList.add('room-mode');
 
     const blockGesture = (e) => {
+      if (e.target?.closest?.('.color-strip-scroll, .sticker-scroll, .touch-scrollable, .mobile-bottomsheet-scroll')) {
+        return;
+      }
       if (e.touches.length > 1) e.preventDefault();
     };
 

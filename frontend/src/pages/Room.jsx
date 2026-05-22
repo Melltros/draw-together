@@ -49,7 +49,9 @@ export const Room = () => {
   const [activeTool, setActiveTool] = useState('pen'); // 'pen', 'eraser', 'line', 'rect', 'circle', 'text'
   const [color, setColor] = useState('#70000E');
   const [brushSize, setBrushSize] = useState(5);
-  
+  const [stickerSize, setStickerSize] = useState(64);
+  const [selectedSticker, setSelectedSticker] = useState(null);
+
   // Custom tool changer that auto-collapses left sidebar on mobile screen
   const handleActiveToolChange = (tool) => {
     setActiveTool(tool);
@@ -385,7 +387,7 @@ export const Room = () => {
       </div>
 
       {/* 2. MAIN DASHBOARD CONTENT AREA */}
-      <div className="flex-1 flex overflow-hidden min-h-0 relative p-1.5 md:p-4 gap-2 md:gap-4 pb-[calc(8.5rem+env(safe-area-inset-bottom,0px))] md:pb-4">
+      <div className="flex-1 flex overflow-hidden min-h-0 relative p-1.5 md:p-4 gap-2 md:gap-4 pb-[calc(11rem+env(safe-area-inset-bottom,0px))] md:pb-4">
         {/* Desktop: left toolbar */}
         <div className="hidden md:flex flex-col shrink-0 gap-3 select-none">
           <Toolbar
@@ -395,6 +397,10 @@ export const Room = () => {
             setColor={setColor}
             brushSize={brushSize}
             setBrushSize={setBrushSize}
+            stickerSize={stickerSize}
+            setStickerSize={setStickerSize}
+            selectedSticker={selectedSticker}
+            onSelectSticker={setSelectedSticker}
           />
         </div>
 
@@ -415,6 +421,8 @@ export const Room = () => {
             setUndoStack={setUndoStack}
             redoStack={redoStack}
             setRedoStack={setRedoStack}
+            selectedSticker={selectedSticker}
+            stickerSize={stickerSize}
           />
 
           {/* Canvas actions — always labeled */}
@@ -521,6 +529,10 @@ export const Room = () => {
               setColor={setColor}
               brushSize={brushSize}
               setBrushSize={setBrushSize}
+              stickerSize={stickerSize}
+              setStickerSize={setStickerSize}
+              selectedSticker={selectedSticker}
+              onSelectSticker={setSelectedSticker}
             />
           </div>
         </div>
@@ -535,6 +547,10 @@ export const Room = () => {
         setColor={setColor}
         brushSize={brushSize}
         setBrushSize={setBrushSize}
+        stickerSize={stickerSize}
+        setStickerSize={setStickerSize}
+        selectedSticker={selectedSticker}
+        onSelectSticker={setSelectedSticker}
         visible={!showLeftSidebar && !showRightSidebar}
       />
 

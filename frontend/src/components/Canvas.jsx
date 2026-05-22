@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { MousePointer, Check, X, Move } from 'lucide-react';
 
-const STROKE_TOOLS = new Set(['pen', 'eraser', 'highlighter']);
+const STROKE_TOOLS = new Set(['pen', 'eraser', 'highlighter', 'glow']);
 
 export const Canvas = ({
   strokes,
@@ -17,7 +17,9 @@ export const Canvas = ({
   undoStack,
   setUndoStack,
   redoStack,
-  setRedoStack
+  setRedoStack,
+  selectedSticker = null,
+  stickerSize = 64
 }) => {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
@@ -39,12 +41,19 @@ export const Canvas = ({
   const activeToolRef = useRef(activeTool);
   const colorRef = useRef(color);
   const brushSizeRef = useRef(brushSize);
+  const selectedStickerRef = useRef(selectedSticker);
+  const stickerSizeRef = useRef(stickerSize);
 
   useEffect(() => {
     activeToolRef.current = activeTool;
     colorRef.current = color;
     brushSizeRef.current = brushSize;
   }, [activeTool, color, brushSize]);
+
+  useEffect(() => {
+    selectedStickerRef.current = selectedSticker;
+    stickerSizeRef.current = stickerSize;
+  }, [selectedSticker, stickerSize]);
 
   useEffect(() => {
     isDrawingRef.current = isDrawing;
@@ -76,6 +85,11 @@ export const Canvas = ({
       if (stroke.tool === 'highlighter') {
         ctx.globalAlpha = 0.38;
         ctx.lineWidth = stroke.size * 1.8;
+      } else if (stroke.tool === 'glow') {
+        ctx.lineWidth = Math.max(stroke.size, 3);
+        ctx.shadowBlur = stroke.size * 2.5;
+        ctx.shadowColor = stroke.color;
+        ctx.strokeStyle = stroke.color;
       }
       if (stroke.points && stroke.points.length > 0) {
         ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
@@ -83,7 +97,13 @@ export const Canvas = ({
           ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
         }
         ctx.stroke();
+        if (stroke.tool === 'glow') {
+          ctx.shadowBlur = stroke.size * 1.2;
+          ctx.globalAlpha = 0.85;
+          ctx.stroke();
+        }
       }
+      ctx.shadowBlur = 0;
       ctx.globalAlpha = 1;
     } else if (stroke.tool === 'line') {
       if (stroke.startPoint && stroke.endPoint) {
@@ -183,25 +203,6 @@ export const Canvas = ({
     redrawCanvas();
   }, [strokes, remoteActiveStrokes, isDrawing, currentPoints]);
 
-  // Sync window emoji stamps to activePlacement state
-  useEffect(() => {
-    const checkStickerChange = setInterval(() => {
-      if (window.selectedEmoji) {
-        // Place sticker at center of canvas initially
-        setActivePlacement({
-          canvasX: CANVAS_WIDTH / 2,
-          canvasY: CANVAS_HEIGHT / 2,
-          text: window.selectedEmoji,
-          type: 'sticker',
-          size: 80,
-          color: '#ffffff'
-        });
-        window.selectedEmoji = null;
-      }
-    }, 150);
-    return () => clearInterval(checkStickerChange);
-  }, []);
-
   useEffect(() => {
     const handleRemoteDraw = (drawData) => {
       if (!drawData) return;
@@ -259,7 +260,19 @@ export const Canvas = ({
         text: '',
         type: 'text',
         size: 32,
-        color: color
+        color: colorRef.current
+      });
+      return;
+    }
+
+    if (activeToolRef.current === 'sticker' && selectedStickerRef.current) {
+      setActivePlacement({
+        canvasX: coords.x,
+        canvasY: coords.y,
+        text: selectedStickerRef.current,
+        type: 'sticker',
+        size: stickerSizeRef.current,
+        color: '#ffffff'
       });
       return;
     }
@@ -299,7 +312,7 @@ export const Canvas = ({
       setTouchPreview({ x: coords.x, y: coords.y });
     }
 
-    if (!isDrawingRef.current || activeToolRef.current === 'text') return;
+    if (!isDrawingRef.current || activeToolRef.current === 'text' || activeToolRef.current === 'sticker') return;
 
     setCurrentPoints((prev) => {
       const updated = [...prev, { x: coords.x, y: coords.y }];
@@ -327,7 +340,7 @@ export const Canvas = ({
   };
 
   const handleEnd = () => {
-    if (!isDrawingRef.current || activeToolRef.current === 'text') return;
+    if (!isDrawingRef.current || activeToolRef.current === 'text' || activeToolRef.current === 'sticker') return;
     setIsDrawing(false);
     setDrawingLock(false);
     setTouchPreview(null);
@@ -495,8 +508,18 @@ export const Canvas = ({
   };
 
   const previewColor =
-    activeTool === 'eraser' ? '#ffffff' : activeTool === 'highlighter' ? `${color}99` : color;
-  const previewSize = Math.min(brushSize * (activeTool === 'highlighter' ? 1.8 : 1), 48);
+    activeTool === 'eraser'
+      ? '#ffffff'
+      : activeTool === 'highlighter'
+        ? `${color}99`
+        : activeTool === 'glow'
+          ? color
+          : color;
+  const previewSize = Math.min(
+    brushSize * (activeTool === 'highlighter' ? 1.8 : activeTool === 'glow' ? 1.4 : 1),
+    48
+  );
+  const previewGlow = activeTool === 'glow' ? `0 0 ${brushSize * 2}px ${color}` : undefined;
 
   return (
     <div
@@ -525,7 +548,8 @@ export const Canvas = ({
               height: previewSize,
               transform: 'translate(-50%, -50%)',
               backgroundColor: previewColor,
-              opacity: activeTool === 'highlighter' ? 0.45 : activeTool === 'eraser' ? 0.2 : 0.55
+              boxShadow: previewGlow,
+              opacity: activeTool === 'highlighter' ? 0.45 : activeTool === 'eraser' ? 0.2 : activeTool === 'glow' ? 0.75 : 0.55
             }}
           />
         )}
@@ -533,7 +557,7 @@ export const Canvas = ({
         {/* Interactive Resizable & Draggable Overlay */}
         {activePlacement && (
           <div
-            className="absolute z-40 bg-dark-sidebar/95 border border-purple-500/40 rounded-2xl p-3.5 shadow-2xl flex flex-col gap-2.5 min-w-[220px]"
+            className="absolute z-40 bg-[#352323]/98 border border-[#C73543]/50 rounded-2xl p-3.5 shadow-2xl flex flex-col gap-2.5 min-w-[220px] max-w-[90vw]"
             style={{
               left: `${(activePlacement.canvasX / CANVAS_WIDTH) * 100}%`,
               top: `${(activePlacement.canvasY / CANVAS_HEIGHT) * 100}%`,
@@ -546,22 +570,24 @@ export const Canvas = ({
               onTouchStart={handleDragStart}
               className="flex items-center justify-between gap-3 border-b border-dark-border/40 pb-2 cursor-move select-none"
             >
-              <div className="flex items-center gap-1.5 text-[9px] font-extrabold text-purple-400 uppercase tracking-widest">
+              <div className="flex items-center gap-1.5 text-[9px] font-extrabold text-[#F7C7CB] uppercase tracking-widest">
                 <Move size={11} />
-                <span>Drag to Position</span>
+                <span>{activePlacement.type === 'sticker' ? 'Drag sticker' : 'Drag text'}</span>
               </div>
               <div className="flex items-center gap-1">
                 <button
+                  type="button"
                   onClick={handlePlacementSubmit}
-                  className="w-5.5 h-5.5 rounded bg-emerald-500/25 text-emerald-400 flex items-center justify-center hover:bg-emerald-500/40 transition-all cursor-pointer"
+                  className="px-2.5 py-1 rounded-lg bg-emerald-600/80 text-white text-[10px] font-bold flex items-center gap-1 hover:bg-emerald-500 transition-all cursor-pointer"
                 >
-                  <Check size={13} />
+                  <Check size={12} /> Place
                 </button>
                 <button
+                  type="button"
                   onClick={() => setActivePlacement(null)}
-                  className="w-5.5 h-5.5 rounded bg-rose-500/25 text-rose-400 flex items-center justify-center hover:bg-rose-500/40 transition-all cursor-pointer"
+                  className="px-2 py-1 rounded-lg bg-rose-500/30 text-rose-300 text-[10px] font-bold hover:bg-rose-500/50 transition-all cursor-pointer"
                 >
-                  <X size={13} />
+                  <X size={12} />
                 </button>
               </div>
             </div>

@@ -32,7 +32,7 @@ export const MobileHint = () => {
             <span className="w-8 h-8 rounded-lg bg-[#C73543]/20 flex items-center justify-center shrink-0">
               <Palette size={14} className="text-[#C73543]" />
             </span>
-            <span><strong className="text-white">Tools</strong> — pick pen, color & brush size</span>
+            <span><strong className="text-white">Tools</strong> — swipe colors, glow pen & stickers</span>
           </li>
           <li className="flex items-center gap-2.5">
             <span className="w-8 h-8 rounded-lg bg-[#C73543]/20 flex items-center justify-center shrink-0">
