@@ -36,12 +36,12 @@ export const Chat = ({ chatMessages = [], sendMessage }) => {
   };
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 glass-panel rounded-2xl overflow-hidden animate-slide-in-right">
+    <div className="flex-1 flex flex-col min-h-0 pinterest-panel rounded-2xl overflow-hidden animate-slide-in-right">
       {/* Header */}
       <div className="px-4 py-3 border-b border-dark-border/50 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-blue-500/15 flex items-center justify-center">
-            <MessageSquare size={14} className="text-blue-400" />
+          <div className="w-7 h-7 rounded-lg bg-[#C73543]/15 flex items-center justify-center">
+            <MessageSquare size={14} className="text-[#C73543]" />
           </div>
           <div>
             <h3 className="text-xs font-bold text-gray-200">Chat</h3>
@@ -68,7 +68,7 @@ export const Chat = ({ chatMessages = [], sendMessage }) => {
             if (isSystem) {
               return (
                 <div key={index} className="flex justify-center py-1">
-                  <span className="text-[10px] font-medium text-gray-500 bg-dark-card/50 px-3 py-1 rounded-full">
+                  <span className="text-[10px] font-medium text-gray-500 bg-dark-card px-3 py-1 rounded-full">
                     {msg.text}
                   </span>
                 </div>
@@ -93,13 +93,12 @@ export const Chat = ({ chatMessages = [], sendMessage }) => {
             }
 
             return (
-              <div key={index} className="flex items-start gap-2 group">
+              <div key={index} className="flex items-start gap-2 group border-0">
                 {/* Mini avatar */}
                 <div
-                  className="w-6 h-6 rounded-full flex items-center justify-center text-[8px] font-black text-white shrink-0 mt-0.5 shadow-md"
+                  className="w-6 h-6 rounded-full flex items-center justify-center text-[8px] font-black text-white shrink-0 mt-0.5"
                   style={{
-                    backgroundColor: msg.color,
-                    boxShadow: `0 0 8px ${msg.color}20`
+                    backgroundColor: msg.color
                   }}
                 >
                   {(msg.username || '?')[0].toUpperCase()}
@@ -115,8 +114,8 @@ export const Chat = ({ chatMessages = [], sendMessage }) => {
                       {formatTime(msg.timestamp)}
                     </span>
                   </div>
-                  <div className="bg-dark-card/70 rounded-xl rounded-tl-sm px-3 py-2 inline-block max-w-full">
-                    <p className="text-xs text-gray-300 font-medium break-words leading-relaxed">
+                  <div className="bg-dark-card rounded-xl rounded-tl-sm px-3 py-2 inline-block max-w-full border border-dark-border/40">
+                    <p className="text-xs text-gray-300 font-semibold break-words leading-relaxed">
                       {msg.text}
                     </p>
                   </div>
@@ -129,12 +128,12 @@ export const Chat = ({ chatMessages = [], sendMessage }) => {
 
       {/* Quick emoji bar */}
       {showEmojis && (
-        <div className="px-3 py-2 border-t border-dark-border/30 flex items-center gap-1.5 animate-scale-in">
+        <div className="px-3 py-2 border-t border-dark-border/30 flex items-center gap-1.5 animate-scale-in bg-dark-bg/40">
           {QUICK_EMOJIS.map((emoji) => (
             <button
               key={emoji}
               onClick={() => handleEmojiClick(emoji)}
-              className="flex-1 flex items-center justify-center p-1.5 text-base rounded-lg bg-dark-card hover:bg-dark-hover hover:scale-110 transition-all active:scale-95"
+              className="flex-1 flex items-center justify-center p-1.5 text-base rounded-lg bg-dark-card hover:bg-dark-hover hover:scale-115 transition-all active:scale-95 cursor-pointer"
             >
               {emoji}
             </button>
@@ -148,9 +147,9 @@ export const Chat = ({ chatMessages = [], sendMessage }) => {
           <button
             type="button"
             onClick={() => setShowEmojis(!showEmojis)}
-            className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all active:scale-90 ${
+            className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all active:scale-90 cursor-pointer ${
               showEmojis
-                ? 'bg-purple-500/20 text-purple-400'
+                ? 'bg-[#C73543]/20 text-[#C73543]'
                 : 'bg-dark-card hover:bg-dark-hover text-gray-500 hover:text-gray-300'
             }`}
           >
@@ -162,12 +161,12 @@ export const Chat = ({ chatMessages = [], sendMessage }) => {
             onChange={(e) => setText(e.target.value)}
             placeholder="Say something..."
             maxLength={200}
-            className="flex-1 bg-dark-card/70 border border-dark-border/40 rounded-xl px-3 py-2.5 text-xs text-gray-200 placeholder:text-gray-600 outline-none focus:border-purple-500/40 focus:shadow-[0_0_0_1px_rgba(124,58,237,0.15)] transition-all font-medium"
+            className="flex-1 pinterest-input px-3 py-2.5 text-xs text-gray-200 placeholder:text-gray-600 outline-none transition-all font-semibold"
           />
           <button
             type="submit"
             disabled={!text.trim()}
-            className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center text-white shrink-0 transition-all hover:shadow-lg hover:shadow-purple-500/20 active:scale-90 disabled:opacity-30 disabled:shadow-none"
+            className="w-9 h-9 rounded-xl bg-[#C73543] hover:bg-[#7A0C22] flex items-center justify-center text-white shrink-0 transition-all active:scale-90 disabled:opacity-30 cursor-pointer"
           >
             <Send size={14} />
           </button>

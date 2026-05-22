@@ -3,12 +3,12 @@ import { Users, Crown, Wifi } from 'lucide-react';
 
 export const UserList = ({ activeUsers = [], selfUserId }) => {
   return (
-    <div className="glass-panel rounded-2xl p-4 mb-3 shrink-0 animate-slide-in-right">
+    <div className="pinterest-panel rounded-2xl p-4 mb-3 shrink-0 animate-slide-in-right">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-purple-500/15 flex items-center justify-center">
-            <Users size={14} className="text-purple-400" />
+          <div className="w-7 h-7 rounded-lg bg-[#C73543]/15 flex items-center justify-center">
+            <Users size={14} className="text-[#C73543]" />
           </div>
           <div>
             <h3 className="text-xs font-bold text-gray-200">Painters</h3>
@@ -34,28 +34,25 @@ export const UserList = ({ activeUsers = [], selfUserId }) => {
             return (
               <div
                 key={user.userId}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 border ${
                   isSelf
-                    ? 'bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20'
-                    : 'bg-dark-card/50 hover:bg-dark-hover/50'
+                    ? 'bg-[#7A0C22]/30 border-[#C73543]/50'
+                    : 'bg-dark-card border-dark-border hover:bg-dark-hover'
                 }`}
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 {/* Avatar */}
                 <div className="relative">
                   <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-black text-white shadow-lg"
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-black text-white"
                     style={{
-                      backgroundColor: user.color,
-                      boxShadow: `0 0 12px ${user.color}30`
+                      backgroundColor: user.color
                     }}
                   >
                     {initials}
                   </div>
                   {/* Online pulse */}
-                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-dark-bg">
-                    <div className="absolute inset-0 bg-emerald-400 rounded-full animate-ping opacity-75" />
-                  </div>
+                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#2A1B1B]" />
                 </div>
 
                 {/* Info */}
@@ -68,7 +65,7 @@ export const UserList = ({ activeUsers = [], selfUserId }) => {
                       <Crown size={10} className="text-yellow-400 shrink-0" />
                     )}
                     {isSelf && (
-                      <span className="text-[8px] font-bold text-purple-400 bg-purple-500/15 px-1.5 py-0.5 rounded-full shrink-0">
+                      <span className="text-[8px] font-bold text-[#F7C7CB] bg-[#7A0C22] px-1.5 py-0.5 rounded-full shrink-0">
                         You
                       </span>
                     )}

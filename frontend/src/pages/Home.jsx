@@ -13,7 +13,6 @@ export const Home = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Trigger entrance animations
     setTimeout(() => setIsLoaded(true), 100);
     
     // Check server connectivity
@@ -30,9 +29,9 @@ export const Home = () => {
       if (!res.ok) throw new Error('Server error');
       const data = await res.json();
 
-      // Epic custom brand palette confetti burst
-      const end = Date.now() + 600;
-      const colors = ['#70000E', '#C3B79D', '#DCD7D4', '#F5F4F2'];
+      // Custom brand palette solid colors confetti
+      const end = Date.now() + 500;
+      const colors = ['#7A0C22', '#C73543', '#F7C7CB', '#FFFFFF'];
       (function frame() {
         confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors });
         confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors });
@@ -57,86 +56,71 @@ export const Home = () => {
   };
 
   const features = [
-    { icon: Palette, title: 'Draw Freely', desc: 'Pen, shapes, text & eraser tools', color: '#70000E' },
-    { icon: Users, title: 'Real-time Collab', desc: 'See live cursors & strokes instantly', color: '#C3B79D' },
-    { icon: MessageSquare, title: 'Built-in Chat', desc: 'Talk while you create together', color: '#DCD7D4' },
-    { icon: Download, title: 'Export PNG', desc: 'Download your masterpiece anytime', color: '#F5F4F2' },
-    { icon: Shield, title: 'No Sign-up', desc: 'Jump in instantly, zero friction', color: '#C3B79D' },
-    { icon: Zap, title: 'Lightning Fast', desc: 'WebSocket-powered sync engine', color: '#70000E' },
+    { icon: Palette, title: 'Draw Freely', desc: 'Pen, shapes, text & eraser tools', color: '#C73543' },
+    { icon: Users, title: 'Real-time Collab', desc: 'See live cursors & strokes instantly', color: '#F7C7CB' },
+    { icon: MessageSquare, title: 'Built-in Chat', desc: 'Talk while you create together', color: '#FFFFFF' },
+    { icon: Download, title: 'Export PNG', desc: 'Download your masterpiece anytime', color: '#F7C7CB' },
+    { icon: Shield, title: 'No Sign-up', desc: 'Jump in instantly, zero friction', color: '#C73543' },
+    { icon: Zap, title: 'Lightning Fast', desc: 'WebSocket-powered sync engine', color: '#FFFFFF' },
   ];
 
   return (
-    <div className="min-h-screen w-screen bg-[#030303] relative overflow-hidden">
-      {/* Animated background orbs using brand ruby and cream colors */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="orb-1 absolute -top-32 -left-32 w-96 h-96 bg-[#70000E]/15 rounded-full blur-3xl" />
-        <div className="orb-2 absolute top-1/3 -right-24 w-80 h-80 bg-[#C3B79D]/10 rounded-full blur-3xl" />
-        <div className="orb-3 absolute -bottom-40 left-1/3 w-96 h-96 bg-[#70000E]/8 rounded-full blur-3xl" />
-        <div className="orb-2 absolute top-1/4 left-1/4 w-64 h-64 bg-[#C3B79D]/5 rounded-full blur-3xl" />
-      </div>
-
-      {/* Subtle noise texture */}
-      <div className="absolute inset-0 noise-bg pointer-events-none" />
-
-      {/* Content */}
-      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-12">
-        
-        {/* Top badge */}
-        <div className={`transition-all duration-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#70000E]/10 via-[#C3B79D]/10 to-[#DCD7D4]/10 border border-[#70000E]/20 mb-8">
-            <Stars size={14} className="text-[#C3B79D] animate-pulse" />
-            <span className="text-xs font-semibold text-[#DCD7D4] tracking-wide">✦ Built by Melltros ✦</span>
-            <span className="text-[10px] font-bold bg-[#70000E]/20 text-[#C3B79D] px-2 py-0.5 rounded-full">Pro</span>
-          </div>
+    <div className="min-h-screen w-screen bg-[#2A1B1B] relative overflow-hidden flex flex-col justify-between">
+      {/* Top Header / Brand Badge */}
+      <header className="w-full py-5 px-6 flex justify-between items-center z-10 select-none">
+        <div className="flex items-center gap-2">
+          <Brush size={20} className="text-[#C73543]" />
+          <span className="font-extrabold text-lg tracking-tight text-white">PaintSync</span>
         </div>
+        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#352323] border border-[#523838]">
+          <Stars size={12} className="text-[#F7C7CB]" />
+          <span className="text-[11px] font-bold text-[#FFFFFF] tracking-wide">✦ Built by Melltros ✦</span>
+        </div>
+      </header>
 
-        {/* Main heading */}
+      {/* Main Hero Section */}
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-8">
+        
+        {/* Main Title */}
         <div className={`text-center mb-8 transition-all duration-700 delay-100 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          <h1 className="text-5xl sm:text-7xl font-black tracking-tight mb-4 leading-none select-none">
-            <span className="gradient-text">Paint</span>
-            <span className="text-white">Sync</span>
+          <h1 className="text-5xl sm:text-7xl font-black tracking-tight mb-3 text-white select-none">
+            Collaborative Art <span className="text-[#C73543]">Studio</span>
           </h1>
-          <p className="text-[#DCD7D4]/80 text-sm sm:text-base max-w-md mx-auto font-medium leading-relaxed">
-            Create, collaborate, and vibe together on a shared canvas.
-            <span className="text-[#C3B79D]"> No registration needed.</span>
+          <p className="text-[#F7C7CB]/80 text-sm sm:text-base max-w-md mx-auto font-semibold">
+            Create, collaborate, and share with your friends in real-time. No sign-up required.
           </p>
         </div>
 
-        {/* Action card */}
+        {/* Pinterest-style Solid Action Card */}
         <div className={`w-full max-w-md transition-all duration-700 delay-200 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          <div className="glass-panel rounded-3xl p-8 relative overflow-hidden gradient-border">
-            {/* Shimmer effect */}
-            <div className="absolute inset-0 shimmer opacity-50" />
-
+          <div className="pinterest-panel rounded-3xl p-8 relative overflow-hidden">
             <div className="relative z-10 space-y-5">
+              
               {/* Create button */}
               <button
                 onClick={handleCreateRoom}
                 disabled={isCreating}
-                className="w-full group relative flex items-center justify-center gap-3 py-4 rounded-2xl font-bold text-white text-sm overflow-hidden transition-all duration-300 active:scale-[0.97] disabled:opacity-60 disabled:cursor-not-allowed btn-glow"
+                className="w-full group flex items-center justify-center gap-3 py-4 bg-[#C73543] hover:bg-[#7A0C22] text-white font-extrabold rounded-2xl transition-all duration-200 active:scale-[0.98] disabled:opacity-60 cursor-pointer"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-[#70000E] via-[#C3B79D] to-[#DCD7D4] animate-gradient" />
-                <div className="relative flex items-center gap-3">
-                  {isCreating ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Creating Board...
-                    </>
-                  ) : (
-                    <>
-                      <Wand2 size={18} className="group-hover:rotate-12 transition-transform" />
-                      Create New Board
-                      <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                    </>
-                  )}
-                </div>
+                {isCreating ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Creating Board...
+                  </>
+                ) : (
+                  <>
+                    <Wand2 size={18} className="group-hover:rotate-12 transition-transform" />
+                    Create New Board
+                    <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                  </>
+                )}
               </button>
 
               {/* Divider */}
               <div className="flex items-center gap-3">
-                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-dark-border to-transparent" />
-                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">or join</span>
-                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-dark-border to-transparent" />
+                <div className="flex-1 h-px bg-[#523838]" />
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">or join</span>
+                <div className="flex-1 h-px bg-[#523838]" />
               </div>
 
               {/* Join input */}
@@ -147,12 +131,12 @@ export const Home = () => {
                   onChange={(e) => setRoomIdInput(e.target.value.toUpperCase())}
                   placeholder="Enter Room Code"
                   maxLength={6}
-                  className="flex-1 glass-input bg-[#1C1919] px-4 py-3.5 text-sm font-bold text-center tracking-[0.3em] uppercase placeholder:tracking-normal placeholder:text-gray-500 placeholder:font-normal"
+                  className="flex-1 pinterest-input px-4 py-3.5 text-sm font-bold text-center tracking-[0.3em] uppercase placeholder:tracking-normal placeholder:text-gray-500 placeholder:font-normal"
                 />
                 <button
                   type="submit"
                   disabled={roomIdInput.trim().length < 4}
-                  className="px-5 py-3.5 bg-dark-card hover:bg-dark-hover border border-dark-border text-white font-bold rounded-xl transition-all duration-200 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="px-5 py-3.5 bg-[#452F2F] hover:bg-[#5A3E3E] border border-[#523838] text-white font-bold rounded-2xl transition-all duration-200 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                 >
                   <ArrowRight size={18} />
                 </button>
@@ -169,7 +153,7 @@ export const Home = () => {
           </div>
         </div>
 
-        {/* Feature grid */}
+        {/* Feature Grid */}
         <div className={`w-full max-w-2xl mt-12 transition-all duration-700 delay-300 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {features.map((feat, i) => {
@@ -177,33 +161,29 @@ export const Home = () => {
               return (
                 <div
                   key={feat.title}
-                  className="group glass-card rounded-2xl p-4 hover:bg-dark-hover/30 transition-all duration-300 hover:-translate-y-1 cursor-default"
-                  style={{ animationDelay: `${i * 80}ms` }}
+                  className="pinterest-card rounded-2xl p-4 hover:bg-[#5A3E3E]/40 transition-all duration-200 hover:-translate-y-0.5 cursor-default"
                 >
                   <div
-                    className="w-9 h-9 rounded-xl flex items-center justify-center mb-3 transition-transform group-hover:scale-110"
-                    style={{ backgroundColor: `${feat.color}15`, color: feat.color }}
+                    className="w-9 h-9 rounded-xl flex items-center justify-center mb-3 text-[#FFFFFF]"
+                    style={{ backgroundColor: `${feat.color}20` }}
                   >
-                    <Icon size={18} />
+                    <Icon size={18} style={{ color: feat.color }} />
                   </div>
-                  <h3 className="text-sm font-bold text-gray-200 mb-1">{feat.title}</h3>
-                  <p className="text-[11px] text-gray-500 font-medium leading-relaxed">{feat.desc}</p>
+                  <h3 className="text-sm font-bold text-gray-100 mb-1">{feat.title}</h3>
+                  <p className="text-[11px] text-gray-400 font-medium leading-relaxed">{feat.desc}</p>
                 </div>
               );
             })}
           </div>
         </div>
+      </main>
 
-        {/* Footer */}
-        <div className={`mt-10 flex flex-col items-center gap-2.5 select-none transition-all duration-700 delay-500 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          <div className="text-[10px] text-gray-600 font-semibold tracking-wider uppercase">
-            Zero Friction • Real-time • No Registration
-          </div>
-          <div className="flex items-center gap-2 text-xs font-bold">
-            <span className="gradient-text">✦ Built by Melltros ✦</span>
-          </div>
+      {/* Footer */}
+      <footer className="w-full py-6 select-none text-center border-t border-[#523838]/40 bg-[#352323]/20">
+        <div className="text-[10px] text-gray-500 font-bold tracking-wider uppercase">
+          Zero Friction • Real-time Sync • Powered by WebSockets
         </div>
-      </div>
+      </footer>
     </div>
   );
 };

@@ -238,18 +238,16 @@ export const Room = () => {
   // Render checking page if board validation is taking place
   if (roomCheckingError) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-dark-bg text-center p-4 relative overflow-hidden">
-        <div className="absolute -top-32 -left-32 w-96 h-96 bg-rose-600/5 rounded-full blur-3xl orb-1" />
-        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-purple-600/5 rounded-full blur-3xl orb-2" />
-        <div className="relative max-w-md glass-panel p-8 rounded-3xl gradient-border animate-scale-in">
-          <div className="w-16 h-16 bg-rose-500/10 rounded-2xl flex items-center justify-center mx-auto mb-5">
-            <Globe size={28} className="text-rose-400 animate-pulse" />
+      <div className="min-h-screen flex items-center justify-center bg-dark-bg text-center p-4">
+        <div className="relative w-full max-w-md pinterest-panel p-8 rounded-3xl animate-scale-in">
+          <div className="w-16 h-16 bg-[#C73543]/15 rounded-2xl flex items-center justify-center mx-auto mb-5">
+            <Globe size={28} className="text-[#C73543]" />
           </div>
           <h2 className="text-xl font-bold text-gray-100 mb-2">Board Not Found</h2>
           <p className="text-sm text-gray-400 mb-6 font-medium">{roomCheckingError}</p>
           <button
             onClick={() => navigate('/')}
-            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-2xl font-bold text-sm text-white transition-all duration-200 active:scale-95 shadow-lg shadow-purple-500/20 btn-glow"
+            className="w-full py-3.5 bg-[#C73543] hover:bg-[#7A0C22] rounded-2xl font-bold text-sm text-white transition-all duration-200 active:scale-95 cursor-pointer"
           >
             Return Home
           </button>
@@ -260,14 +258,10 @@ export const Room = () => {
 
   if (!roomExistsChecked) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-dark-bg text-center gap-4 relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="orb-1 absolute top-1/4 left-1/4 w-64 h-64 bg-purple-600/5 rounded-full blur-3xl" />
-          <div className="orb-2 absolute bottom-1/4 right-1/4 w-64 h-64 bg-pink-600/5 rounded-full blur-3xl" />
-        </div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-dark-bg text-center gap-4">
         <div className="relative">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600/20 to-pink-600/20 flex items-center justify-center mb-4 mx-auto animate-glow">
-            <Loader2 size={28} className="text-purple-400 animate-spin" />
+          <div className="w-16 h-16 rounded-2xl bg-[#C73543]/15 flex items-center justify-center mb-4 mx-auto">
+            <Loader2 size={28} className="text-[#C73543] animate-spin" />
           </div>
           <span className="text-sm font-bold text-gray-300">Loading Board...</span>
           <p className="text-[10px] text-gray-500 mt-1 font-medium">Connecting to PaintSync servers</p>
@@ -277,24 +271,24 @@ export const Room = () => {
   }
 
   return (
-    <div className="min-h-screen max-h-screen w-screen bg-[#0A0A0D] flex flex-col overflow-hidden relative">
+    <div className="min-h-screen max-h-screen w-screen bg-[#2A1B1B] flex flex-col overflow-hidden relative">
       {/* 1. TOP NAVBAR PANEL */}
-      <header className="h-14 glass-panel border-b border-dark-border/50 px-4 sm:px-5 flex items-center justify-between shrink-0 select-none">
+      <header className="h-14 pinterest-panel border-b border-dark-border px-4 sm:px-5 flex items-center justify-between shrink-0 select-none">
         {/* Left */}
         <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={() => navigate('/')}
-            className="flex items-center gap-1.5 text-xs font-semibold text-gray-400 hover:text-white transition-all bg-dark-card border border-dark-border/50 hover:bg-dark-hover px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-xl active:scale-95"
+            className="flex items-center gap-1.5 text-xs font-bold text-gray-300 hover:text-white transition-all bg-dark-card border border-dark-border hover:bg-dark-hover px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-xl active:scale-95 cursor-pointer"
           >
             <ArrowLeft size={13} />
             <span className="hidden sm:inline">Exit</span>
           </button>
           
-          <div className="h-4 w-[1px] bg-dark-border/50" />
+          <div className="h-4 w-[1px] bg-dark-border" />
           
           <div className="flex items-center gap-1.5">
-            <span className="text-xs sm:text-sm font-extrabold tracking-widest bg-gradient-to-r from-purple-500/15 to-pink-500/15 border border-purple-500/20 px-2.5 py-0.5 rounded-lg">
-              <span className="gradient-text">{formattedRoomId}</span>
+            <span className="text-xs sm:text-sm font-extrabold tracking-widest bg-dark-card border border-dark-border px-2.5 py-0.5 rounded-lg text-white">
+              {formattedRoomId}
             </span>
           </div>
         </div>
@@ -304,14 +298,11 @@ export const Room = () => {
           <div className="relative flex items-center">
             <span
               className={`w-2 h-2 rounded-full shrink-0 ${
-                isConnected ? 'bg-emerald-500' : 'bg-rose-500'
+                isConnected ? 'bg-emerald-500' : 'bg-[#C73543]'
               }`}
             />
-            {isConnected && (
-              <span className="absolute w-2 h-2 bg-emerald-400 rounded-full shrink-0 animate-ping opacity-75" />
-            )}
           </div>
-          <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
             {isConnected ? 'Synced' : 'Connecting...'}
           </span>
         </div>
@@ -319,11 +310,11 @@ export const Room = () => {
         {/* Right */}
         <div className="flex items-center gap-1.5">
           {username && (
-            <div className="hidden sm:flex items-center gap-2 bg-dark-card/50 border border-dark-border/40 rounded-xl py-1 px-2.5">
+            <div className="hidden sm:flex items-center gap-2 bg-[#452F2F] border border-dark-border rounded-xl py-1 px-2.5">
               <div className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-black text-white" style={{ backgroundColor: userColor }}>
                 {(username || '?')[0].toUpperCase()}
               </div>
-              <span className="text-[11px] font-semibold text-gray-300 truncate max-w-[70px]">
+              <span className="text-[11px] font-bold text-white truncate max-w-[70px]">
                 {username}
               </span>
             </div>
@@ -331,7 +322,7 @@ export const Room = () => {
 
           <button
             onClick={handleCopyLink}
-            className="flex items-center gap-1.5 text-xs font-semibold text-purple-400 bg-purple-500/10 border border-purple-500/20 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-xl hover:bg-purple-500/20 transition-all active:scale-95"
+            className="flex items-center gap-1.5 text-xs font-bold text-[#F7C7CB] bg-[#7A0C22] border border-dark-border px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-xl hover:bg-[#C73543] transition-all active:scale-95 cursor-pointer"
           >
             {copiedLink ? <Check size={13} className="animate-bounce" /> : <Copy size={13} />}
             <span className="hidden sm:inline">{copiedLink ? 'Copied!' : 'Share'}</span>
@@ -342,10 +333,10 @@ export const Room = () => {
               setShowLeftSidebar(!showLeftSidebar);
               setShowRightSidebar(false);
             }}
-            className={`md:hidden flex items-center justify-center w-9 h-9 rounded-xl border active:scale-95 transition-all ${
+            className={`md:hidden flex items-center justify-center w-9 h-9 rounded-xl border active:scale-95 transition-all cursor-pointer ${
               showLeftSidebar
-                ? 'bg-purple-500/20 border-purple-500/30 text-purple-400'
-                : 'bg-dark-card border-dark-border/50 text-gray-400 hover:text-purple-400'
+                ? 'bg-[#C73543] border-dark-border text-white'
+                : 'bg-dark-card border-dark-border text-gray-400 hover:text-white'
             }`}
             title="Toggle Drawing Tools"
           >
@@ -357,16 +348,16 @@ export const Room = () => {
               setShowRightSidebar(!showRightSidebar);
               setShowLeftSidebar(false);
             }}
-            className={`md:hidden flex items-center justify-center w-9 h-9 rounded-xl border active:scale-95 transition-all relative ${
+            className={`md:hidden flex items-center justify-center w-9 h-9 rounded-xl border active:scale-95 transition-all relative cursor-pointer ${
               showRightSidebar
-                ? 'bg-purple-500/20 border-purple-500/30 text-purple-400'
-                : 'bg-dark-card border-dark-border/50 text-gray-400 hover:text-purple-400'
+                ? 'bg-[#C73543] border-dark-border text-white'
+                : 'bg-dark-card border-dark-border text-gray-400 hover:text-white'
             }`}
             title="Toggle Chat & Painters"
           >
             <MessageSquare size={15} />
             {activeUsers.length > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full text-[8px] font-bold text-white flex items-center justify-center shadow-lg">
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#C73543] rounded-full text-[8px] font-bold text-white flex items-center justify-center">
                 {activeUsers.length}
               </span>
             )}
@@ -412,34 +403,34 @@ export const Room = () => {
           />
 
           {/* 3. BOTTOM PANEL ACTIONS */}
-          <div className="h-12 glass-panel rounded-2xl flex items-center justify-between px-3 sm:px-4 select-none shrink-0 border border-dark-border/50">
+          <div className="h-12 pinterest-panel rounded-2xl flex items-center justify-between px-3 sm:px-4 select-none shrink-0 border border-dark-border">
             <div className="flex items-center gap-1.5">
               <button
                 onClick={handleLocalUndo}
                 disabled={undoStack.length === 0}
                 title="Undo (Ctrl+Z)"
-                className="flex items-center gap-1 px-2.5 py-1.5 sm:px-3 sm:py-1.5 bg-dark-card hover:bg-dark-hover border border-dark-border/50 disabled:opacity-30 text-gray-400 hover:text-white rounded-xl transition-all text-[11px] font-bold active:scale-95 shrink-0"
+                className="flex items-center gap-1 px-2.5 py-1.5 sm:px-3 sm:py-1.5 bg-dark-card hover:bg-dark-hover border border-[#523838] disabled:opacity-30 text-gray-300 hover:text-white rounded-xl transition-all text-[11px] font-extrabold active:scale-95 shrink-0 cursor-pointer"
               >
                 <Undo2 size={13} />
                 <span className="hidden sm:inline">Undo</span>
-                <span className="text-[8px] font-bold text-purple-400/60 bg-purple-500/10 px-1 py-0.5 rounded">{undoStack.length}</span>
+                <span className="text-[8px] font-black text-[#F7C7CB] bg-[#7A0C22] px-1.5 py-0.5 rounded">{undoStack.length}</span>
               </button>
               <button
                 onClick={handleLocalRedo}
                 disabled={redoStack.length === 0}
                 title="Redo (Ctrl+Y)"
-                className="flex items-center gap-1 px-2.5 py-1.5 sm:px-3 sm:py-1.5 bg-dark-card hover:bg-dark-hover border border-dark-border/50 disabled:opacity-30 text-gray-400 hover:text-white rounded-xl transition-all text-[11px] font-bold active:scale-95 shrink-0"
+                className="flex items-center gap-1 px-2.5 py-1.5 sm:px-3 sm:py-1.5 bg-dark-card hover:bg-dark-hover border border-[#523838] disabled:opacity-30 text-gray-300 hover:text-white rounded-xl transition-all text-[11px] font-extrabold active:scale-95 shrink-0 cursor-pointer"
               >
                 <Redo2 size={13} />
                 <span className="hidden sm:inline">Redo</span>
-                <span className="text-[8px] font-bold text-purple-400/60 bg-purple-500/10 px-1 py-0.5 rounded">{redoStack.length}</span>
+                <span className="text-[8px] font-black text-[#F7C7CB] bg-[#7A0C22] px-1.5 py-0.5 rounded">{redoStack.length}</span>
               </button>
             </div>
 
             <button
               onClick={handleLocalClear}
               disabled={strokes.length === 0}
-              className="flex items-center gap-1.5 px-3 py-1.5 hover:bg-rose-500/10 border border-dark-border/50 text-rose-400/80 hover:text-rose-300 rounded-xl transition-all text-[11px] font-bold active:scale-95 disabled:opacity-20 shrink-0"
+              className="flex items-center gap-1.5 px-3 py-1.5 hover:bg-[#7A0C22]/30 border border-[#523838] text-[#F7C7CB] rounded-xl transition-all text-[11px] font-extrabold active:scale-95 disabled:opacity-20 shrink-0 cursor-pointer"
             >
               <Trash2 size={13} />
               <span className="hidden sm:inline">Clear</span>
@@ -447,7 +438,7 @@ export const Room = () => {
 
             <button
               onClick={handleDownload}
-              className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-1.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-xl shadow-lg shadow-purple-600/15 hover:shadow-purple-500/25 transition-all text-[11px] font-bold active:scale-95 shrink-0 btn-glow"
+              className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-1.5 bg-[#C73543] hover:bg-[#7A0C22] text-white rounded-xl transition-all text-[11px] font-extrabold active:scale-95 shrink-0 cursor-pointer"
             >
               <Download size={13} />
               <span className="hidden sm:inline">Export</span>
@@ -457,14 +448,14 @@ export const Room = () => {
 
         {/* RIGHT WORKSPACE BAR (User profiles list + chat panels) */}
         <div 
-          className={`flex-col shrink-0 w-80 h-[calc(100%-2rem)] md:h-full min-h-0 z-30 absolute md:relative top-16 md:top-0 right-4 md:right-0 bg-dark-bg/95 md:bg-transparent border border-dark-border md:border-0 rounded-2xl md:rounded-none shadow-2xl md:shadow-none p-4 md:p-0 transition-all duration-300 ${
+          className={`flex-col shrink-0 w-80 h-[calc(100%-2rem)] md:h-full min-h-0 z-30 absolute md:relative top-16 md:top-0 right-4 md:right-0 bg-[#2A1B1B] md:bg-transparent border border-dark-border md:border-0 rounded-2xl md:rounded-none shadow-2xl md:shadow-none p-4 md:p-0 transition-all duration-300 ${
             showRightSidebar ? 'flex' : 'hidden md:flex'
           }`}
         >
           <div className="flex md:hidden justify-end mb-2">
             <button
               onClick={() => setShowRightSidebar(false)}
-              className="text-xs font-semibold text-indigo-400 bg-indigo-500/10 border border-indigo-500/25 px-3 py-1.5 rounded-xl active:scale-95"
+              className="text-xs font-bold text-[#F7C7CB] bg-[#7A0C22] border border-[#523838] px-3 py-1.5 rounded-xl active:scale-95 cursor-pointer"
             >
               Close Drawer
             </button>
@@ -476,20 +467,16 @@ export const Room = () => {
 
       {/* 4. USERNAME OVERLAY SELECTION MODAL */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-xl">
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="orb-1 absolute top-1/4 left-1/4 w-48 h-48 bg-purple-600/10 rounded-full blur-3xl" />
-            <div className="orb-2 absolute bottom-1/4 right-1/4 w-48 h-48 bg-pink-600/10 rounded-full blur-3xl" />
-          </div>
-          <div className="relative w-full max-w-sm mx-4 glass-panel p-8 rounded-3xl text-center animate-scale-in gradient-border">
-            <div className="w-14 h-14 bg-gradient-to-br from-purple-500/20 to-pink-500/20 text-purple-400 rounded-2xl flex items-center justify-center mx-auto mb-5">
-              <Palette size={24} className="animate-pulse" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
+          <div className="relative w-full max-w-sm mx-4 pinterest-panel p-8 rounded-3xl text-center animate-scale-in">
+            <div className="w-14 h-14 bg-[#C73543]/15 text-[#C73543] rounded-2xl flex items-center justify-center mx-auto mb-5">
+              <Palette size={24} />
             </div>
             
-            <h2 className="text-2xl font-black text-gray-100 mb-2">
-              <span className="gradient-text">Join</span> the Canvas
+            <h2 className="text-2xl font-black text-white mb-2">
+              Join the Canvas
             </h2>
-            <p className="text-xs text-gray-500 mb-6 font-medium leading-relaxed">
+            <p className="text-xs text-gray-400 mb-6 font-semibold leading-relaxed">
               Pick a display name. You'll get a unique color assigned automatically.
             </p>
 
@@ -500,17 +487,16 @@ export const Room = () => {
                 required
                 maxLength={16}
                 value={modalInput}
-                onChange={(e) => setModalInput(e.target.value)}
+                onChange={(e) => setRoomIdInput ? setModalInput(e.target.value) : setModalInput(e.target.value)}
                 placeholder="Your name"
-                className="w-full glass-input bg-dark-input px-4 py-3.5 text-sm text-center font-bold tracking-wide placeholder:font-normal placeholder:tracking-normal"
+                className="w-full pinterest-input bg-[#1F1313] px-4 py-3.5 text-sm text-center font-bold tracking-wide placeholder:font-normal placeholder:tracking-normal"
               />
               <button
                 type="submit"
                 disabled={!modalInput.trim()}
-                className="relative w-full py-3.5 text-white font-bold rounded-2xl active:scale-[0.97] transition-all disabled:opacity-40 overflow-hidden btn-glow"
+                className="w-full py-3.5 bg-[#C73543] hover:bg-[#7A0C22] text-white font-extrabold rounded-2xl active:scale-[0.97] transition-all disabled:opacity-40 cursor-pointer"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 animate-gradient" />
-                <span className="relative">Start Drawing ✨</span>
+                <span>Start Drawing ✨</span>
               </button>
             </form>
           </div>
