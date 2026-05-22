@@ -15,7 +15,7 @@ export const StickerPlacementBar = ({
   return (
     <div
       className="fixed left-0 right-0 z-[45] px-3 pointer-events-auto"
-      style={{ bottom: 'calc(8.5rem + env(safe-area-inset-bottom, 0px))' }}
+      style={{ bottom: 'calc(11rem + env(safe-area-inset-bottom, 0px))' }}
     >
       <div className="pinterest-panel rounded-2xl p-3 shadow-2xl border-[#C73543]/40 max-w-lg mx-auto">
         <div className="flex items-center gap-3 mb-3">

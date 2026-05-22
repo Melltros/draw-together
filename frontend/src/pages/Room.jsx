@@ -5,9 +5,7 @@ import { Toolbar } from '../components/Toolbar';
 import { Canvas } from '../components/Canvas';
 import { UserList } from '../components/UserList';
 import { Chat } from '../components/Chat';
-import { MobileHint } from '../components/MobileHint';
-import { MobileQuickBar } from '../components/MobileQuickBar';
-import { MobileCanvasActions } from '../components/MobileCanvasActions';
+import { MobileDock } from '../components/MobileDock';
 import { useRoomBodyLock } from '../hooks/useRoomBodyLock';
 import {
   Undo2,
@@ -53,6 +51,7 @@ export const Room = () => {
   const [stickerSize, setStickerSize] = useState(64);
   const [selectedSticker, setSelectedSticker] = useState(null);
   const [placementMode, setPlacementMode] = useState(false);
+  const [mobileTab, setMobileTab] = useState('canvas');
 
   // Custom tool changer that auto-collapses left sidebar on mobile screen
   const handleActiveToolChange = (tool) => {
@@ -292,13 +291,20 @@ export const Room = () => {
 
   const mobileDrawerOpen = showLeftSidebar || showRightSidebar;
 
+  const handleMobileTab = (tab) => {
+    setMobileTab(tab);
+    setShowLeftSidebar(tab === 'tools');
+    setShowRightSidebar(tab === 'chat');
+  };
+
   const closeMobilePanels = () => {
+    setMobileTab('canvas');
     setShowLeftSidebar(false);
     setShowRightSidebar(false);
   };
 
   return (
-    <div className="app-shell bg-[#2A1B1B] flex flex-col relative">
+    <div className="app-shell flex flex-col relative">
       {showReconnectNotice && (
         <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-emerald-500/90 text-white text-xs font-bold shadow-lg animate-slide-up">
           Reconnected — you&apos;re back online
@@ -389,7 +395,7 @@ export const Room = () => {
       </div>
 
       {/* 2. MAIN DASHBOARD CONTENT AREA */}
-      <div className="flex-1 flex overflow-hidden min-h-0 relative p-1.5 md:p-4 gap-2 md:gap-4 pb-[calc(15rem+env(safe-area-inset-bottom,0px))] md:pb-4">
+      <div className="flex-1 flex overflow-hidden min-h-0 relative p-1.5 md:p-4 gap-2 md:gap-4 max-md:pb-[calc(10.5rem+env(safe-area-inset-bottom,0px))] md:pb-4">
         {/* Desktop: left toolbar */}
         <div className="hidden md:flex flex-col shrink-0 gap-3 select-none">
           <Toolbar
@@ -542,9 +548,15 @@ export const Room = () => {
         </div>
       )}
 
-      {!placementMode && <MobileHint />}
-
-      <MobileCanvasActions
+      <MobileDock
+        activeTab={mobileTab}
+        onTabChange={handleMobileTab}
+        activeTool={activeTool}
+        setActiveTool={handleActiveToolChange}
+        color={color}
+        setColor={setColor}
+        brushSize={brushSize}
+        setBrushSize={setBrushSize}
         onUndo={handleLocalUndo}
         onRedo={handleLocalRedo}
         onClear={handleLocalClear}
@@ -552,73 +564,11 @@ export const Room = () => {
         canUndo={undoStack.length > 0}
         canRedo={redoStack.length > 0}
         canClear={strokes.length > 0}
-        visible={!showLeftSidebar && !showRightSidebar && !placementMode}
+        isConnected={isConnected}
+        roomId={formattedRoomId}
+        hasChat={chatMessages.length > 0}
+        visible={!placementMode}
       />
-
-      <MobileQuickBar
-        activeTool={activeTool}
-        setActiveTool={handleActiveToolChange}
-        color={color}
-        setColor={setColor}
-        brushSize={brushSize}
-        setBrushSize={setBrushSize}
-        stickerSize={stickerSize}
-        setStickerSize={setStickerSize}
-        selectedSticker={selectedSticker}
-        onSelectSticker={setSelectedSticker}
-        visible={!showLeftSidebar && !showRightSidebar && !placementMode}
-      />
-
-      {/* Mobile: bottom navigation */}
-      <nav
-        className="md:hidden fixed left-0 right-0 bottom-0 z-20 flex items-stretch gap-1 px-2 pt-2 border-t border-[#523838] bg-[#352323] safe-bottom"
-        aria-label="Main menu"
-      >
-        <button
-          type="button"
-          onClick={() => {
-            setShowLeftSidebar(!showLeftSidebar);
-            setShowRightSidebar(false);
-          }}
-          className={`flex-1 flex flex-col items-center justify-center gap-1 py-2.5 rounded-xl cursor-pointer ${
-            showLeftSidebar ? 'bg-[#C73543] text-white' : 'text-gray-400 hover:text-gray-200'
-          }`}
-        >
-          <Palette size={20} strokeWidth={2.5} />
-          <span className="text-[11px] font-bold">Tools</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={closeMobilePanels}
-          className={`flex-[1.15] flex flex-col items-center justify-center gap-1 py-2 rounded-2xl cursor-pointer border-2 transition-all active:scale-95 ${
-            !showLeftSidebar && !showRightSidebar
-              ? 'border-[#C73543] bg-[#C73543]/15 text-white'
-              : 'border-[#523838] text-gray-400 hover:text-white'
-          }`}
-        >
-          <Pencil size={22} strokeWidth={2.5} className={!showLeftSidebar && !showRightSidebar ? 'text-[#F7C7CB]' : ''} />
-          <span className="text-[11px] font-bold">Canvas</span>
-          <span className="text-[9px] font-medium opacity-70">{isConnected ? 'Tap to draw' : 'Connecting…'}</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => {
-            setShowRightSidebar(!showRightSidebar);
-            setShowLeftSidebar(false);
-          }}
-          className={`flex-1 flex flex-col items-center justify-center gap-1 py-2.5 rounded-xl cursor-pointer relative ${
-            showRightSidebar ? 'bg-[#C73543] text-white' : 'text-gray-400 hover:text-gray-200'
-          }`}
-        >
-          <MessageSquare size={20} strokeWidth={2.5} />
-          <span className="text-[11px] font-bold">Chat</span>
-          {chatMessages.length > 0 && !showRightSidebar && (
-            <span className="absolute top-1.5 right-[28%] min-w-[8px] h-2 px-0.5 bg-[#F7C7CB] rounded-full" />
-          )}
-        </button>
-      </nav>
 
       {/* 4. USERNAME OVERLAY SELECTION MODAL */}
       {showModal && (

@@ -25,7 +25,7 @@ export function renderStrokesToContext(ctx, strokes, drawStrokeFn, width, height
 /**
  * Flood fill at canvas coordinates; returns a fill patch stroke object.
  */
-export function createFillPatch(strokes, x, y, fillColor, bgColor = '#1F1313', tolerance = 36) {
+export function createFillPatch(strokes, x, y, fillColor, bgColor = '#0d1117', tolerance = 36) {
   const drawStrokeFn = drawStroke;
   const width = CANVAS_SIZE;
   const height = CANVAS_SIZE;

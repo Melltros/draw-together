@@ -43,7 +43,7 @@ export const Home = () => {
       const data = await res.json();
 
       const end = Date.now() + 500;
-      const colors = ['#7A0C22', '#C73543', '#F7C7CB', '#FFFFFF'];
+      const colors = ['#ff6b5b', '#ff8a7a', '#ffc9c1', '#f8fafc'];
       (function frame() {
         confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors });
         confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors });
@@ -75,16 +75,16 @@ export const Home = () => {
   ];
 
   return (
-    <div className="page-scroll bg-[#2A1B1B] relative">
+    <div className="page-scroll relative" style={{ backgroundColor: 'var(--color-bg)' }}>
       <div className="pointer-events-none fixed inset-0 overflow-hidden -z-0" aria-hidden>
-        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[min(90vw,520px)] h-[320px] rounded-full bg-[#7A0C22]/25 blur-[100px]" />
-        <div className="absolute bottom-0 right-0 w-72 h-72 rounded-full bg-[#C73543]/15 blur-[80px]" />
+        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[min(90vw,520px)] h-[320px] rounded-full bg-[#ff6b5b]/20 blur-[100px]" />
+        <div className="absolute bottom-0 right-0 w-72 h-72 rounded-full bg-[#3b82f6]/10 blur-[80px]" />
       </div>
 
       <div className="relative z-10 flex flex-col max-w-5xl mx-auto w-full px-4 sm:px-6 pb-12">
         <header className="w-full py-5 flex items-center gap-2.5 shrink-0">
-          <div className="w-10 h-10 rounded-xl bg-[#C73543]/20 border border-[#C73543]/30 flex items-center justify-center">
-            <Brush size={20} className="text-[#C73543]" />
+          <div className="w-10 h-10 rounded-xl bg-[var(--color-primary)]/20 border border-[var(--color-primary)]/40 flex items-center justify-center">
+            <Brush size={20} className="text-[var(--color-primary)]" />
           </div>
           <div>
             <span className="font-extrabold text-lg text-white block leading-tight">PaintSync</span>
@@ -96,7 +96,7 @@ export const Home = () => {
           <div className={`text-center mb-8 max-w-xl transition-all duration-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
             <h1 className="text-3xl sm:text-5xl font-black text-white mb-3 leading-tight">
               Draw with friends,
-              <span className="text-[#C73543]"> same canvas</span>
+              <span className="text-[var(--color-primary)]"> same canvas</span>
             </h1>
             <p className="text-gray-400 text-sm sm:text-base font-medium leading-relaxed">
               No account needed. Create a room, share the code, start drawing in seconds.
@@ -112,7 +112,7 @@ export const Home = () => {
                   key={step.num}
                   className="flex items-center gap-3 p-3 rounded-2xl bg-[#352323]/60 border border-[#523838]/50"
                 >
-                  <span className="w-8 h-8 rounded-full bg-[#C73543] text-white text-sm font-black flex items-center justify-center shrink-0">
+                  <span className="w-8 h-8 rounded-full bg-[var(--color-primary)] text-white text-sm font-black flex items-center justify-center shrink-0">
                     {step.num}
                   </span>
                   <div className="text-left min-w-0">
@@ -132,7 +132,7 @@ export const Home = () => {
                 <button
                   onClick={handleCreateRoom}
                   disabled={isCreating}
-                  className="w-full flex items-center justify-center gap-2 py-4 bg-[#C73543] hover:bg-[#7A0C22] text-white font-bold text-base rounded-2xl transition-all active:scale-[0.98] disabled:opacity-60 cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 py-4 bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white font-bold text-base rounded-2xl transition-all active:scale-[0.98] disabled:opacity-60 cursor-pointer"
                 >
                   {isCreating ? (
                     <>

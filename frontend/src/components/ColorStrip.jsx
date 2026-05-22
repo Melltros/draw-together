@@ -53,7 +53,7 @@ export const ColorStrip = ({
                   aria-selected={selected}
                   onClick={() => setColor(c)}
                   className={`${dotClass} rounded-full shrink-0 border-2 cursor-pointer transition-transform active:scale-95 ${
-                    selected ? 'border-white scale-110 ring-2 ring-[#C73543]/60' : 'border-white/20'
+                    selected ? 'border-white scale-110 ring-2 ring-[var(--color-primary)]' : 'border-white/25'
                   }`}
                   style={{ backgroundColor: c }}
                   title={c}

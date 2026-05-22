@@ -2,55 +2,70 @@
 
 @import "tailwindcss";
 
+/* Slate ink + coral accent — clearer contrast than brown-red */
 @theme {
-  --color-dark-bg: #2A1B1B;
-  --color-dark-sidebar: #352323;
-  --color-dark-card: #452F2F;
-  --color-dark-border: #523838;
-  --color-dark-input: #1F1313;
-  --color-dark-hover: #5A3E3E;
-  
-  --color-accent: #7A0C22;
-  --color-accent-rose: #C73543;
-  --color-accent-pink: #F7C7CB;
-  --color-accent-white: #FFFFFF;
-  
+  --color-dark-bg: #0f1419;
+  --color-dark-sidebar: #1a2332;
+  --color-dark-card: #243044;
+  --color-dark-border: #3d4f66;
+  --color-dark-input: #0d1117;
+  --color-dark-hover: #2d3a4f;
+
+  --color-accent: #ff6b5b;
+  --color-accent-rose: #ff8a7a;
+  --color-accent-pink: #ffc9c1;
+  --color-accent-white: #f8fafc;
+
   --font-sans: 'Outfit', 'Plus Jakarta Sans', 'Inter', sans-serif;
+}
+
+:root {
+  --color-bg: #0f1419;
+  --color-surface: #1a2332;
+  --color-surface-2: #243044;
+  --color-border: #3d4f66;
+  --color-input: #0d1117;
+  --color-primary: #ff6b5b;
+  --color-primary-hover: #e85a4a;
+  --color-accent-soft: #ffc9c1;
+  --color-text: #f1f5f9;
+  --color-text-muted: #94a3b8;
+  --mobile-dock-base: 4.25rem;
 }
 
 @layer utilities {
   .canvas-grid-bg {
-    background-color: #1F1313;
-    background-image: 
-      linear-gradient(to right, rgba(247, 199, 203, 0.03) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(247, 199, 203, 0.03) 1px, transparent 1px);
+    background-color: #0d1117;
+    background-image:
+      linear-gradient(to right, rgba(148, 163, 184, 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
     background-size: 20px 20px;
   }
 
   .pinterest-panel {
-    background-color: #352323;
-    border: 1px solid #523838;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
   }
 
   .pinterest-card {
-    background-color: #452F2F;
-    border: 1px solid #523838;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    background-color: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
   }
 
   .pinterest-input {
-    background-color: #1F1313;
-    border: 1px solid #523838;
+    background-color: var(--color-input);
+    border: 1px solid var(--color-border);
     transition: all 0.2s ease-in-out;
     outline: none;
-    border-radius: 16px;
-    color: #FFFFFF;
+    border-radius: 12px;
+    color: var(--color-text);
   }
 
   .pinterest-input:focus {
-    border-color: #C73543;
-    background-color: #251616;
+    border-color: var(--color-primary);
+    background-color: #151b24;
   }
 
   .animate-slide-up {
@@ -68,22 +83,22 @@
   .ux-label {
     font-size: 0.625rem;
     font-weight: 700;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: #9ca3af;
+    color: var(--color-text-muted);
   }
 
   .ux-hint {
     font-size: 0.6875rem;
     font-weight: 500;
-    color: #9ca3af;
-    line-height: 1.4;
+    color: var(--color-text-muted);
+    line-height: 1.45;
   }
 
   .ux-section-title {
     font-size: 0.75rem;
     font-weight: 700;
-    color: #e5e7eb;
+    color: var(--color-text);
   }
 }
 
@@ -100,8 +115,8 @@
 
   body {
     overflow-x: hidden;
-    background-color: #2A1B1B;
-    color: #FFFFFF;
+    background-color: var(--color-bg);
+    color: var(--color-text);
     font-family: 'Outfit', 'Plus Jakarta Sans', 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -112,12 +127,11 @@
   }
 
   ::selection {
-    background-color: #7A0C22;
-    color: #FFFFFF;
+    background-color: var(--color-primary);
+    color: #fff;
   }
 }
 
-/* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -128,72 +142,47 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #523838;
+  background: var(--color-border);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #7A0C22;
+  background: var(--color-primary);
 }
 
-/* Range input styled for Pinterest theme */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
   cursor: pointer;
   height: 6px;
   border-radius: 9999px;
-  background: #523838;
+  background: var(--color-border);
   outline: none;
 }
 
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
-  background: #F7C7CB;
+  background: var(--color-primary);
   cursor: pointer;
-  transition: transform 0.1s ease;
 }
 
-input[type="range"]::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-}
-
-/* Keyframes */
 @keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  from { opacity: 0; transform: translateX(15px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 .floating-cursor-label {
@@ -201,7 +190,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
   z-index: 9999;
 }
 
-/* Touch-scroll utility: enables native smooth scrolling inside containers on mobile */
 .touch-scrollable {
   overflow-y: auto;
   overflow-x: hidden;
@@ -210,7 +198,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
   overscroll-behavior-y: contain;
 }
 
-/* Single-page vertical scroll (home, etc.) */
 .page-scroll {
   min-height: 100dvh;
   width: 100%;
@@ -218,10 +205,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
-  overscroll-behavior-y: auto;
 }
 
-/* Full-viewport app shell (room) — no document scroll */
 .app-shell {
   height: 100dvh;
   max-height: 100dvh;
@@ -229,9 +214,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
   overflow: hidden;
   overscroll-behavior: none;
   touch-action: manipulation;
+  background-color: var(--color-bg);
 }
 
-/* Room mode: block pull-to-refresh / rubber-band reload on mobile */
 html.room-mode,
 body.room-mode {
   overflow: hidden;
@@ -242,7 +227,6 @@ body.room-mode {
   height: 100%;
 }
 
-/* Drawing surface — never scroll or trigger browser gestures */
 .draw-surface {
   touch-action: none;
   -webkit-touch-callout: none;
@@ -256,61 +240,49 @@ body.room-mode {
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
 }
 
-/* iOS safe areas (notch, home indicator) */
 .safe-bottom {
-  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
 }
 
-.safe-top {
-  padding-top: max(0px, env(safe-area-inset-top, 0px));
-}
-
-/* Full-screen mobile panel (chat) — input always visible at bottom */
 .mobile-fullsheet {
   position: fixed;
   left: 0;
   right: 0;
   top: 3.5rem;
-  bottom: 0;
+  bottom: calc(var(--mobile-dock-base) + env(safe-area-inset-bottom, 0px));
   z-index: 40;
   display: flex;
   flex-direction: column;
   min-height: 0;
   overflow: hidden;
-  background-color: #2A1B1B;
+  background-color: var(--color-bg);
 }
 
-/* Bottom sheet for tools on mobile */
 .mobile-bottomsheet {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: calc(var(--mobile-dock-base) + env(safe-area-inset-bottom, 0px));
   z-index: 40;
-  max-height: min(88dvh, 640px);
+  max-height: min(75dvh, 560px);
   display: flex;
   flex-direction: column;
   min-height: 0;
   border-radius: 1.25rem 1.25rem 0 0;
-  background-color: #352323;
-  border-top: 1px solid #523838;
-  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.45);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background-color: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.5);
 }
 
 .mobile-bottomsheet-scroll {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
 }
 
-/* Horizontal swipe rows (colors, sticker tabs) — must use pan-x, NOT pan-y */
 .color-strip-scroll,
 .sticker-scroll {
   overflow-x: auto;
@@ -328,6 +300,6 @@ body.room-mode {
 
 .color-strip-scroll::-webkit-scrollbar-thumb,
 .sticker-scroll::-webkit-scrollbar-thumb {
-  background: #523838;
+  background: var(--color-border);
   border-radius: 4px;
 }
