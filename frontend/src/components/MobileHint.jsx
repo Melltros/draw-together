@@ -14,7 +14,7 @@ export const MobileHint = () => {
   };
 
   return (
-    <div className="md:hidden fixed left-3 right-3 bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] z-[35] animate-slide-up">
+    <div className="md:hidden fixed left-3 right-3 bottom-[calc(9rem+env(safe-area-inset-bottom,0px))] z-[35] animate-slide-up">
       <div className="pinterest-panel rounded-2xl p-4 shadow-2xl border-[#C73543]/30">
         <div className="flex items-start justify-between gap-2 mb-3">
           <p className="text-sm font-bold text-white">Quick guide</p>

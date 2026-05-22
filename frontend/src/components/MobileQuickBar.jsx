@@ -47,7 +47,7 @@ export const MobileQuickBar = ({
   return (
     <div
       className="md:hidden fixed left-2 right-2 z-[18] flex flex-col gap-2"
-      style={{ bottom: 'calc(5.5rem + env(safe-area-inset-bottom, 0px))', touchAction: 'manipulation' }}
+      style={{ bottom: 'calc(8.75rem + env(safe-area-inset-bottom, 0px))', touchAction: 'manipulation' }}
     >
       <div className="pinterest-panel rounded-2xl p-2.5 shadow-lg space-y-2">
         <div className="flex items-center gap-1">

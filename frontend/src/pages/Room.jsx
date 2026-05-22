@@ -7,6 +7,7 @@ import { UserList } from '../components/UserList';
 import { Chat } from '../components/Chat';
 import { MobileHint } from '../components/MobileHint';
 import { MobileQuickBar } from '../components/MobileQuickBar';
+import { MobileCanvasActions } from '../components/MobileCanvasActions';
 import { useRoomBodyLock } from '../hooks/useRoomBodyLock';
 import {
   Undo2,
@@ -388,7 +389,7 @@ export const Room = () => {
       </div>
 
       {/* 2. MAIN DASHBOARD CONTENT AREA */}
-      <div className="flex-1 flex overflow-hidden min-h-0 relative p-1.5 md:p-4 gap-2 md:gap-4 pb-[calc(11rem+env(safe-area-inset-bottom,0px))] md:pb-4">
+      <div className="flex-1 flex overflow-hidden min-h-0 relative p-1.5 md:p-4 gap-2 md:gap-4 pb-[calc(15rem+env(safe-area-inset-bottom,0px))] md:pb-4">
         {/* Desktop: left toolbar */}
         <div className="hidden md:flex flex-col shrink-0 gap-3 select-none">
           <Toolbar
@@ -428,8 +429,8 @@ export const Room = () => {
             onStickerSizeChange={setStickerSize}
           />
 
-          {/* Canvas actions — always labeled */}
-          <div className="pinterest-panel rounded-2xl flex items-center justify-between gap-1 px-2 py-2 sm:px-3 shrink-0 border border-dark-border">
+          {/* Canvas actions — desktop only (mobile uses fixed bar above nav) */}
+          <div className="hidden md:flex pinterest-panel rounded-2xl items-center justify-between gap-1 px-2 py-2 sm:px-3 shrink-0 border border-dark-border">
             <div className="flex items-center gap-1">
               <button
                 onClick={handleLocalUndo}
@@ -542,6 +543,17 @@ export const Room = () => {
       )}
 
       {!placementMode && <MobileHint />}
+
+      <MobileCanvasActions
+        onUndo={handleLocalUndo}
+        onRedo={handleLocalRedo}
+        onClear={handleLocalClear}
+        onDownload={handleDownload}
+        canUndo={undoStack.length > 0}
+        canRedo={redoStack.length > 0}
+        canClear={strokes.length > 0}
+        visible={!showLeftSidebar && !showRightSidebar && !placementMode}
+      />
 
       <MobileQuickBar
         activeTool={activeTool}
