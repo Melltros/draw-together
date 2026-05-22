@@ -40,7 +40,7 @@ export const Toolbar = ({
   const tools = [
     { id: 'pen', icon: Pencil, label: 'Pen' },
     { id: 'glow', icon: Sparkles, label: 'Glow' },
-    { id: 'fill', icon: Paintbucket, label: 'Fill' },
+    { id: 'fill', icon: PaintBucket, label: 'Fill' },
     { id: 'highlighter', icon: Highlighter, label: 'Mark' },
     { id: 'eraser', icon: Eraser, label: 'Erase' },
     { id: 'filledRect', icon: Square, label: 'Fill □' },
