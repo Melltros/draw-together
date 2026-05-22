@@ -5,19 +5,22 @@ import { Toolbar } from '../components/Toolbar';
 import { Canvas } from '../components/Canvas';
 import { UserList } from '../components/UserList';
 import { Chat } from '../components/Chat';
+import { MobileHint } from '../components/MobileHint';
 import {
   Undo2,
   Redo2,
   Trash2,
   Download,
-  Share2,
   ArrowLeft,
   Copy,
   Check,
   Globe,
   Loader2,
   Palette,
-  MessageSquare
+  MessageSquare,
+  Pencil,
+  Link2,
+  Users
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -242,13 +245,13 @@ export const Room = () => {
           <div className="w-16 h-16 bg-[#C73543]/15 rounded-2xl flex items-center justify-center mx-auto mb-5">
             <Globe size={28} className="text-[#C73543]" />
           </div>
-          <h2 className="text-xl font-bold text-gray-100 mb-2">Board Not Found</h2>
+          <h2 className="text-xl font-bold text-gray-100 mb-2">Room not found</h2>
           <p className="text-sm text-gray-400 mb-6 font-medium">{roomCheckingError}</p>
           <button
             onClick={() => navigate('/')}
             className="w-full py-3.5 bg-[#C73543] hover:bg-[#7A0C22] rounded-2xl font-bold text-sm text-white transition-all duration-200 active:scale-95 cursor-pointer"
           >
-            Return Home
+            Go to homepage
           </button>
         </div>
       </div>
@@ -262,8 +265,8 @@ export const Room = () => {
           <div className="w-16 h-16 rounded-2xl bg-[#C73543]/15 flex items-center justify-center mb-4 mx-auto">
             <Loader2 size={28} className="text-[#C73543] animate-spin" />
           </div>
-          <span className="text-sm font-bold text-gray-300">Loading Board...</span>
-          <p className="text-[10px] text-gray-500 mt-1 font-medium">Connecting to PaintSync servers</p>
+          <span className="text-sm font-bold text-gray-300">Opening room…</span>
+          <p className="ux-hint mt-1">Connecting you to the shared canvas</p>
         </div>
       </div>
     );
@@ -287,67 +290,70 @@ export const Room = () => {
         />
       )}
 
-      {/* 1. TOP NAVBAR PANEL */}
-      <header className="h-14 pinterest-panel border-b border-dark-border px-4 sm:px-5 flex items-center justify-between shrink-0 select-none">
-        {/* Left */}
-        <div className="flex items-center gap-2 sm:gap-3">
+      {/* Top bar */}
+      <header className="h-auto min-h-14 pinterest-panel border-b border-dark-border px-3 sm:px-5 py-2 flex items-center justify-between gap-2 shrink-0 select-none">
+        <div className="flex items-center gap-2 min-w-0">
           <button
             onClick={() => navigate('/')}
-            className="flex items-center gap-1.5 text-xs font-bold text-gray-300 hover:text-white transition-all bg-dark-card border border-dark-border hover:bg-dark-hover px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-xl active:scale-95 cursor-pointer"
+            className="flex items-center gap-1 text-xs font-bold text-gray-300 hover:text-white bg-dark-card border border-dark-border hover:bg-dark-hover px-2.5 py-2 rounded-xl active:scale-95 cursor-pointer shrink-0"
           >
-            <ArrowLeft size={13} />
-            <span className="hidden sm:inline">Exit</span>
+            <ArrowLeft size={14} />
+            <span className="hidden sm:inline">Leave</span>
           </button>
-          
-          <div className="h-4 w-[1px] bg-dark-border" />
-          
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs sm:text-sm font-extrabold tracking-widest bg-dark-card border border-dark-border px-2.5 py-0.5 rounded-lg text-white">
+
+          <div className="min-w-0">
+            <p className="ux-label leading-none mb-0.5">Room code</p>
+            <p className="text-sm sm:text-base font-black tracking-widest text-white truncate">
               {formattedRoomId}
-            </span>
+            </p>
           </div>
         </div>
 
-        {/* Center */}
-        <div className="hidden md:flex items-center gap-2">
-          <div className="relative flex items-center">
-            <span
-              className={`w-2 h-2 rounded-full shrink-0 ${
-                isConnected ? 'bg-emerald-500' : 'bg-[#C73543]'
-              }`}
-            />
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <div
+            className={`hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-lg border text-[10px] font-bold ${
+              isConnected
+                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                : 'bg-[#C73543]/10 border-[#C73543]/30 text-[#F7C7CB]'
+            }`}
+          >
+            <span className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-emerald-400' : 'bg-[#C73543] animate-pulse'}`} />
+            {isConnected ? 'Connected' : 'Connecting…'}
           </div>
-          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-            {isConnected ? 'Synced' : 'Connecting...'}
-          </span>
-        </div>
 
-        {/* Right */}
-        <div className="flex items-center gap-1.5">
           {username && (
-            <div className="hidden sm:flex items-center gap-2 bg-[#452F2F] border border-dark-border rounded-xl py-1 px-2.5">
-              <div className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-black text-white" style={{ backgroundColor: userColor }}>
+            <div className="hidden md:flex items-center gap-1.5 bg-[#452F2F] border border-dark-border rounded-xl py-1 px-2">
+              <div
+                className="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-black text-white"
+                style={{ backgroundColor: userColor }}
+              >
                 {(username || '?')[0].toUpperCase()}
               </div>
-              <span className="text-[11px] font-bold text-white truncate max-w-[70px]">
-                {username}
-              </span>
+              <span className="text-[11px] font-bold text-white max-w-[72px] truncate">{username}</span>
             </div>
           )}
 
           <button
             onClick={handleCopyLink}
-            className="flex items-center gap-1.5 text-xs font-bold text-[#F7C7CB] bg-[#7A0C22] border border-dark-border px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-xl hover:bg-[#C73543] transition-all active:scale-95 cursor-pointer"
+            className="flex items-center gap-1.5 text-xs font-bold text-white bg-[#C73543] hover:bg-[#7A0C22] px-3 py-2 rounded-xl active:scale-95 cursor-pointer"
+            title="Copy link to invite friends"
           >
-            {copiedLink ? <Check size={13} className="animate-bounce" /> : <Copy size={13} />}
-            <span className="hidden sm:inline">{copiedLink ? 'Copied!' : 'Share'}</span>
+            {copiedLink ? <Check size={14} /> : <Link2 size={14} />}
+            <span>{copiedLink ? 'Copied!' : 'Invite'}</span>
           </button>
-
         </div>
       </header>
 
+      {/* Desktop: where things are */}
+      <div className="hidden md:flex items-center justify-center gap-6 px-4 py-1.5 bg-[#352323]/40 border-b border-[#523838]/40 text-[11px] font-medium text-gray-400 shrink-0">
+        <span className="flex items-center gap-1.5"><Palette size={12} className="text-[#C73543]" /> Tools on the left</span>
+        <span className="flex items-center gap-1.5"><Pencil size={12} className="text-[#F7C7CB]" /> Draw in the center</span>
+        <span className="flex items-center gap-1.5"><MessageSquare size={12} className="text-[#C73543]" /> Chat on the right</span>
+        <span className="flex items-center gap-1.5"><Users size={12} /> {activeUsers.length} here now</span>
+      </div>
+
       {/* 2. MAIN DASHBOARD CONTENT AREA */}
-      <div className="flex-1 flex overflow-hidden min-h-0 relative p-1.5 md:p-4 gap-2 md:gap-4 pb-[calc(3.25rem+env(safe-area-inset-bottom,0px))] md:pb-4">
+      <div className="flex-1 flex overflow-hidden min-h-0 relative p-1.5 md:p-4 gap-2 md:gap-4 pb-[calc(5.25rem+env(safe-area-inset-bottom,0px))] md:pb-4">
         {/* Desktop: left toolbar */}
         <div className="hidden md:flex flex-col shrink-0 gap-3 select-none">
           <Toolbar
@@ -379,46 +385,46 @@ export const Room = () => {
             setRedoStack={setRedoStack}
           />
 
-          {/* 3. BOTTOM PANEL ACTIONS */}
-          <div className="h-12 pinterest-panel rounded-2xl flex items-center justify-between px-3 sm:px-4 select-none shrink-0 border border-dark-border">
-            <div className="flex items-center gap-1.5">
+          {/* Canvas actions — always labeled */}
+          <div className="pinterest-panel rounded-2xl flex items-center justify-between gap-1 px-2 py-2 sm:px-3 shrink-0 border border-dark-border">
+            <div className="flex items-center gap-1">
               <button
                 onClick={handleLocalUndo}
                 disabled={undoStack.length === 0}
-                title="Undo (Ctrl+Z)"
-                className="flex items-center gap-1 px-2.5 py-1.5 sm:px-3 sm:py-1.5 bg-dark-card hover:bg-dark-hover border border-[#523838] disabled:opacity-30 text-gray-300 hover:text-white rounded-xl transition-all text-[11px] font-extrabold active:scale-95 shrink-0 cursor-pointer"
+                aria-label="Undo last stroke"
+                className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 px-2 py-1.5 sm:px-3 bg-dark-card hover:bg-dark-hover border border-[#523838] disabled:opacity-30 text-gray-300 hover:text-white rounded-xl text-[10px] font-bold active:scale-95 cursor-pointer"
               >
-                <Undo2 size={13} />
-                <span className="hidden sm:inline">Undo</span>
-                <span className="text-[8px] font-black text-[#F7C7CB] bg-[#7A0C22] px-1.5 py-0.5 rounded">{undoStack.length}</span>
+                <Undo2 size={14} />
+                <span>Undo</span>
               </button>
               <button
                 onClick={handleLocalRedo}
                 disabled={redoStack.length === 0}
-                title="Redo (Ctrl+Y)"
-                className="flex items-center gap-1 px-2.5 py-1.5 sm:px-3 sm:py-1.5 bg-dark-card hover:bg-dark-hover border border-[#523838] disabled:opacity-30 text-gray-300 hover:text-white rounded-xl transition-all text-[11px] font-extrabold active:scale-95 shrink-0 cursor-pointer"
+                aria-label="Redo"
+                className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 px-2 py-1.5 sm:px-3 bg-dark-card hover:bg-dark-hover border border-[#523838] disabled:opacity-30 text-gray-300 hover:text-white rounded-xl text-[10px] font-bold active:scale-95 cursor-pointer"
               >
-                <Redo2 size={13} />
-                <span className="hidden sm:inline">Redo</span>
-                <span className="text-[8px] font-black text-[#F7C7CB] bg-[#7A0C22] px-1.5 py-0.5 rounded">{redoStack.length}</span>
+                <Redo2 size={14} />
+                <span>Redo</span>
               </button>
             </div>
 
             <button
               onClick={handleLocalClear}
               disabled={strokes.length === 0}
-              className="flex items-center gap-1.5 px-3 py-1.5 hover:bg-[#7A0C22]/30 border border-[#523838] text-[#F7C7CB] rounded-xl transition-all text-[11px] font-extrabold active:scale-95 disabled:opacity-20 shrink-0 cursor-pointer"
+              aria-label="Clear entire canvas"
+              className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 px-2 py-1.5 text-[#F7C7CB] border border-[#523838] hover:bg-[#7A0C22]/25 rounded-xl text-[10px] font-bold active:scale-95 disabled:opacity-25 cursor-pointer"
             >
-              <Trash2 size={13} />
-              <span className="hidden sm:inline">Clear</span>
+              <Trash2 size={14} />
+              <span>Clear all</span>
             </button>
 
             <button
               onClick={handleDownload}
-              className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-1.5 bg-[#C73543] hover:bg-[#7A0C22] text-white rounded-xl transition-all text-[11px] font-extrabold active:scale-95 shrink-0 cursor-pointer"
+              aria-label="Save drawing as PNG"
+              className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 px-3 py-1.5 bg-[#C73543] hover:bg-[#7A0C22] text-white rounded-xl text-[10px] font-bold active:scale-95 cursor-pointer"
             >
-              <Download size={13} />
-              <span className="hidden sm:inline">Export</span>
+              <Download size={14} />
+              <span>Save PNG</span>
             </button>
           </div>
         </div>
@@ -434,16 +440,19 @@ export const Room = () => {
       {showRightSidebar && (
         <div className="mobile-fullsheet md:hidden" role="dialog" aria-label="Chat">
           <div className="shrink-0 flex items-center justify-between px-4 py-3 border-b border-[#523838] bg-[#352323]">
-            <div className="flex items-center gap-2">
-              <MessageSquare size={16} className="text-[#C73543]" />
-              <span className="text-sm font-bold text-white">Chat</span>
+            <div>
+              <div className="flex items-center gap-2">
+                <MessageSquare size={16} className="text-[#C73543]" />
+                <span className="text-sm font-bold text-white">Group chat</span>
+              </div>
+              <p className="ux-hint mt-0.5 ml-6">Back to canvas when you&apos;re done</p>
             </div>
             <button
               type="button"
               onClick={() => setShowRightSidebar(false)}
-              className="text-xs font-bold text-white bg-[#7A0C22] hover:bg-[#C73543] px-4 py-2 rounded-xl active:scale-95 cursor-pointer"
+              className="text-xs font-bold text-white bg-[#C73543] hover:bg-[#7A0C22] px-4 py-2.5 rounded-xl active:scale-95 cursor-pointer"
             >
-              Done
+              ← Canvas
             </button>
           </div>
           <UserList activeUsers={activeUsers} selfUserId={userId} compact />
@@ -459,13 +468,16 @@ export const Room = () => {
           <div className="shrink-0 flex flex-col items-center pt-2 pb-1">
             <div className="w-10 h-1 rounded-full bg-[#523838] mb-2" aria-hidden />
             <div className="w-full flex items-center justify-between px-4 pb-2">
-              <span className="text-sm font-bold text-white">Drawing tools</span>
+              <div>
+                <span className="text-sm font-bold text-white block">Drawing tools</span>
+                <span className="ux-hint">Pick a tool, then draw on the canvas</span>
+              </div>
               <button
                 type="button"
                 onClick={() => setShowLeftSidebar(false)}
-                className="text-xs font-bold text-[#F7C7CB] bg-[#7A0C22] px-3 py-1.5 rounded-xl active:scale-95 cursor-pointer"
+                className="text-xs font-bold text-white bg-[#C73543] px-3 py-2 rounded-xl active:scale-95 cursor-pointer shrink-0"
               >
-                Done
+                ← Canvas
               </button>
             </div>
           </div>
@@ -482,10 +494,12 @@ export const Room = () => {
         </div>
       )}
 
-      {/* Mobile: bottom dock — quick access to tools & chat */}
+      <MobileHint />
+
+      {/* Mobile: bottom navigation */}
       <nav
-        className="md:hidden fixed left-0 right-0 bottom-0 z-20 flex items-stretch justify-around gap-1 px-2 pt-2 border-t border-[#523838] bg-[#352323]/95 backdrop-blur-md safe-bottom"
-        aria-label="Mobile actions"
+        className="md:hidden fixed left-0 right-0 bottom-0 z-20 flex items-stretch gap-1 px-2 pt-2 border-t border-[#523838] bg-[#352323] safe-bottom"
+        aria-label="Main menu"
       >
         <button
           type="button"
@@ -493,37 +507,42 @@ export const Room = () => {
             setShowLeftSidebar(!showLeftSidebar);
             setShowRightSidebar(false);
           }}
-          className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2 rounded-xl transition-all active:scale-95 cursor-pointer ${
-            showLeftSidebar ? 'bg-[#C73543] text-white' : 'text-gray-400'
+          className={`flex-1 flex flex-col items-center justify-center gap-1 py-2.5 rounded-xl cursor-pointer ${
+            showLeftSidebar ? 'bg-[#C73543] text-white' : 'text-gray-400 hover:text-gray-200'
           }`}
         >
-          <Palette size={18} />
-          <span className="text-[10px] font-bold">Tools</span>
+          <Palette size={20} strokeWidth={2.5} />
+          <span className="text-[11px] font-bold">Tools</span>
         </button>
+
         <button
           type="button"
           onClick={closeMobilePanels}
-          className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 rounded-xl text-gray-400 active:scale-95 cursor-pointer"
+          className={`flex-[1.15] flex flex-col items-center justify-center gap-1 py-2 rounded-2xl cursor-pointer border-2 transition-all active:scale-95 ${
+            !showLeftSidebar && !showRightSidebar
+              ? 'border-[#C73543] bg-[#C73543]/15 text-white'
+              : 'border-[#523838] text-gray-400 hover:text-white'
+          }`}
         >
-          <span className="text-[10px] font-bold text-emerald-400/90 uppercase tracking-wide">
-            {isConnected ? 'Live' : '…'}
-          </span>
-          <span className="text-[9px] font-medium text-gray-500">{formattedRoomId}</span>
+          <Pencil size={22} strokeWidth={2.5} className={!showLeftSidebar && !showRightSidebar ? 'text-[#F7C7CB]' : ''} />
+          <span className="text-[11px] font-bold">Canvas</span>
+          <span className="text-[9px] font-medium opacity-70">{isConnected ? 'Tap to draw' : 'Connecting…'}</span>
         </button>
+
         <button
           type="button"
           onClick={() => {
             setShowRightSidebar(!showRightSidebar);
             setShowLeftSidebar(false);
           }}
-          className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2 rounded-xl transition-all active:scale-95 cursor-pointer relative ${
-            showRightSidebar ? 'bg-[#C73543] text-white' : 'text-gray-400'
+          className={`flex-1 flex flex-col items-center justify-center gap-1 py-2.5 rounded-xl cursor-pointer relative ${
+            showRightSidebar ? 'bg-[#C73543] text-white' : 'text-gray-400 hover:text-gray-200'
           }`}
         >
-          <MessageSquare size={18} />
-          <span className="text-[10px] font-bold">Chat</span>
+          <MessageSquare size={20} strokeWidth={2.5} />
+          <span className="text-[11px] font-bold">Chat</span>
           {chatMessages.length > 0 && !showRightSidebar && (
-            <span className="absolute top-1 right-[22%] w-2 h-2 bg-[#F7C7CB] rounded-full" />
+            <span className="absolute top-1.5 right-[28%] min-w-[8px] h-2 px-0.5 bg-[#F7C7CB] rounded-full" />
           )}
         </button>
       </nav>
@@ -536,30 +555,34 @@ export const Room = () => {
               <Palette size={24} />
             </div>
             
+            <p className="ux-label mb-2">Before you draw</p>
             <h2 className="text-2xl font-black text-white mb-2">
-              Join the Canvas
+              What&apos;s your name?
             </h2>
-            <p className="text-xs text-gray-400 mb-6 font-semibold leading-relaxed">
-              Pick a display name. You'll get a unique color assigned automatically.
+            <p className="text-sm text-gray-400 mb-6 font-medium leading-relaxed">
+              Friends will see this next to your cursor. You also get your own color.
             </p>
 
-            <form onSubmit={handleModalSubmit} className="space-y-4">
-              <input
-                type="text"
-                autoFocus
-                required
-                maxLength={16}
-                value={modalInput}
-                onChange={(e) => setModalInput(e.target.value)}
-                placeholder="Your name"
-                className="w-full pinterest-input bg-[#1F1313] px-4 py-3.5 text-sm text-center font-bold tracking-wide placeholder:font-normal placeholder:tracking-normal"
-              />
+            <form onSubmit={handleModalSubmit} className="space-y-4 text-left">
+              <label className="block">
+                <span className="ux-label mb-1.5 block">Display name</span>
+                <input
+                  type="text"
+                  autoFocus
+                  required
+                  maxLength={16}
+                  value={modalInput}
+                  onChange={(e) => setModalInput(e.target.value)}
+                  placeholder="e.g. Alex"
+                  className="w-full pinterest-input px-4 py-3.5 text-sm font-bold placeholder:font-normal"
+                />
+              </label>
               <button
                 type="submit"
                 disabled={!modalInput.trim()}
-                className="w-full py-3.5 bg-[#C73543] hover:bg-[#7A0C22] text-white font-extrabold rounded-2xl active:scale-[0.97] transition-all disabled:opacity-40 cursor-pointer"
+                className="w-full py-3.5 bg-[#C73543] hover:bg-[#7A0C22] text-white font-bold text-base rounded-2xl active:scale-[0.97] transition-all disabled:opacity-40 cursor-pointer"
               >
-                <span>Start Drawing ✨</span>
+                Enter the room
               </button>
             </form>
           </div>

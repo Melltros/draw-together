@@ -1,9 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Brush, ArrowRight, AlertCircle, Zap, Users, MessageSquare, Palette, Download, Shield, Wand2, Stars } from 'lucide-react';
+import {
+  Brush,
+  ArrowRight,
+  AlertCircle,
+  Users,
+  MessageSquare,
+  Palette,
+  Download,
+  Wand2
+} from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://draw-together-xckc.onrender.com';
+
+const STEPS = [
+  { num: '1', title: 'Create a room', desc: 'You get a short code to share' },
+  { num: '2', title: 'Send the code', desc: 'Friends open the link or enter the code' },
+  { num: '3', title: 'Draw together', desc: 'Everyone sees the same canvas live' },
+];
 
 export const Home = () => {
   const [roomIdInput, setRoomIdInput] = useState('');
@@ -14,9 +29,8 @@ export const Home = () => {
 
   useEffect(() => {
     setTimeout(() => setIsLoaded(true), 100);
-
     fetch(`${BACKEND_URL}/api/room/healthcheck`).catch(() => {
-      setError('Connection failed. Server might be offline.');
+      setError('Cannot reach the server. Try again in a moment.');
     });
   }, []);
 
@@ -38,8 +52,8 @@ export const Home = () => {
 
       navigate(`/room/${data.roomId}`);
     } catch (err) {
-      console.error('Error: Could not create room', err);
-      setError('Could not create room. Server might be offline.');
+      console.error(err);
+      setError('Could not create a room. Check your internet and try again.');
     } finally {
       setIsCreating(false);
     }
@@ -54,128 +68,138 @@ export const Home = () => {
   };
 
   const features = [
-    { icon: Palette, title: 'Draw Freely', desc: 'Pen, shapes, text & eraser tools', color: '#C73543' },
-    { icon: Users, title: 'Real-time Collab', desc: 'See live cursors & strokes instantly', color: '#F7C7CB' },
-    { icon: MessageSquare, title: 'Built-in Chat', desc: 'Talk while you create together', color: '#FFFFFF' },
-    { icon: Download, title: 'Export PNG', desc: 'Download your masterpiece anytime', color: '#F7C7CB' },
-    { icon: Shield, title: 'No Sign-up', desc: 'Jump in instantly, zero friction', color: '#C73543' },
-    { icon: Zap, title: 'Lightning Fast', desc: 'WebSocket-powered sync engine', color: '#FFFFFF' },
+    { icon: Palette, title: 'Drawing tools', desc: 'Pen, shapes, text, eraser & stickers' },
+    { icon: Users, title: 'Live together', desc: 'See where everyone is drawing' },
+    { icon: MessageSquare, title: 'Group chat', desc: 'Talk while you create' },
+    { icon: Download, title: 'Save your art', desc: 'Download as a PNG image' },
   ];
 
   return (
     <div className="page-scroll bg-[#2A1B1B] relative">
-      {/* Ambient background */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden -z-0" aria-hidden>
         <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[min(90vw,520px)] h-[320px] rounded-full bg-[#7A0C22]/25 blur-[100px]" />
         <div className="absolute bottom-0 right-0 w-72 h-72 rounded-full bg-[#C73543]/15 blur-[80px]" />
-        <div className="absolute top-1/3 -left-20 w-56 h-56 rounded-full bg-[#F7C7CB]/8 blur-[60px]" />
       </div>
 
-      <div className="relative z-10 flex flex-col max-w-5xl mx-auto w-full px-4 sm:px-6 pb-10">
-        <header className="w-full py-5 flex justify-between items-center shrink-0 select-none">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-[#C73543]/20 border border-[#C73543]/30 flex items-center justify-center">
-              <Brush size={18} className="text-[#C73543]" />
-            </div>
-            <span className="font-extrabold text-lg tracking-tight text-white">PaintSync</span>
+      <div className="relative z-10 flex flex-col max-w-5xl mx-auto w-full px-4 sm:px-6 pb-12">
+        <header className="w-full py-5 flex items-center gap-2.5 shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-[#C73543]/20 border border-[#C73543]/30 flex items-center justify-center">
+            <Brush size={20} className="text-[#C73543]" />
           </div>
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#352323]/80 border border-[#523838] backdrop-blur-sm">
-            <Stars size={12} className="text-[#F7C7CB]" />
-            <span className="text-[10px] sm:text-[11px] font-bold text-white/90 tracking-wide">Built by Melltros</span>
+          <div>
+            <span className="font-extrabold text-lg text-white block leading-tight">PaintSync</span>
+            <span className="text-[11px] text-gray-500 font-medium">Free group drawing board</span>
           </div>
         </header>
 
-        <main className="flex-1 flex flex-col items-center py-6 sm:py-10 pb-8">
-          <div className={`text-center mb-8 sm:mb-10 transition-all duration-700 delay-100 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-            <p className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-[#F7C7CB]/70 mb-4 px-3 py-1 rounded-full border border-[#523838]/60 bg-[#352323]/50">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              Live collaborative canvas
-            </p>
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight mb-4 text-white leading-[1.05]">
-              Draw together,
-              <br />
-              <span className="text-[#C73543]">in real time</span>
+        <main className="flex flex-col items-center py-4 sm:py-8">
+          <div className={`text-center mb-8 max-w-xl transition-all duration-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+            <h1 className="text-3xl sm:text-5xl font-black text-white mb-3 leading-tight">
+              Draw with friends,
+              <span className="text-[#C73543]"> same canvas</span>
             </h1>
-            <p className="text-[#F7C7CB]/75 text-sm sm:text-base max-w-lg mx-auto font-medium leading-relaxed">
-              Create a board, share the room code, and paint with friends instantly. No accounts, no installs.
+            <p className="text-gray-400 text-sm sm:text-base font-medium leading-relaxed">
+              No account needed. Create a room, share the code, start drawing in seconds.
             </p>
           </div>
 
-          <div className={`w-full max-w-md transition-all duration-700 delay-200 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-            <div className="pinterest-panel rounded-3xl p-6 sm:p-8 shadow-xl shadow-black/20">
-              <div className="space-y-5">
+          {/* How it works */}
+          <div className={`w-full max-w-lg mb-8 transition-all duration-700 delay-75 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
+            <p className="ux-label text-center mb-3">How it works</p>
+            <div className="grid gap-2">
+              {STEPS.map((step) => (
+                <div
+                  key={step.num}
+                  className="flex items-center gap-3 p-3 rounded-2xl bg-[#352323]/60 border border-[#523838]/50"
+                >
+                  <span className="w-8 h-8 rounded-full bg-[#C73543] text-white text-sm font-black flex items-center justify-center shrink-0">
+                    {step.num}
+                  </span>
+                  <div className="text-left min-w-0">
+                    <p className="text-sm font-bold text-white">{step.title}</p>
+                    <p className="ux-hint">{step.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Main actions */}
+          <div className={`w-full max-w-md transition-all duration-700 delay-150 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+            <div className="pinterest-panel rounded-3xl p-6 sm:p-7 space-y-6">
+              <div>
+                <p className="ux-label mb-2">Start new session</p>
                 <button
                   onClick={handleCreateRoom}
                   disabled={isCreating}
-                  className="w-full group flex items-center justify-center gap-3 py-4 bg-gradient-to-r from-[#C73543] to-[#9B2230] hover:from-[#C73543] hover:to-[#7A0C22] text-white font-extrabold rounded-2xl transition-all duration-200 active:scale-[0.98] disabled:opacity-60 cursor-pointer shadow-lg shadow-[#7A0C22]/30"
+                  className="w-full flex items-center justify-center gap-2 py-4 bg-[#C73543] hover:bg-[#7A0C22] text-white font-bold text-base rounded-2xl transition-all active:scale-[0.98] disabled:opacity-60 cursor-pointer"
                 >
                   {isCreating ? (
                     <>
                       <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Creating Board...
+                      Creating your room…
                     </>
                   ) : (
                     <>
-                      <Wand2 size={18} className="group-hover:rotate-12 transition-transform" />
-                      Create New Board
-                      <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                      <Wand2 size={20} />
+                      Create a room
                     </>
                   )}
                 </button>
-
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 h-px bg-[#523838]" />
-                  <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">or join</span>
-                  <div className="flex-1 h-px bg-[#523838]" />
-                </div>
-
-                <form onSubmit={handleJoinRoom} className="flex gap-2">
-                  <input
-                    type="text"
-                    value={roomIdInput}
-                    onChange={(e) => setRoomIdInput(e.target.value.toUpperCase())}
-                    placeholder="Room code"
-                    maxLength={6}
-                    className="flex-1 pinterest-input px-4 py-3.5 text-sm font-bold text-center tracking-[0.3em] uppercase placeholder:tracking-normal placeholder:text-gray-500 placeholder:font-normal"
-                  />
-                  <button
-                    type="submit"
-                    disabled={roomIdInput.trim().length < 4}
-                    className="px-5 py-3.5 bg-[#452F2F] hover:bg-[#5A3E3E] border border-[#523838] text-white font-bold rounded-2xl transition-all duration-200 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
-                    aria-label="Join room"
-                  >
-                    <ArrowRight size={18} />
-                  </button>
-                </form>
-
-                {error && (
-                  <div className="flex items-center gap-2 text-xs font-medium text-rose-300 bg-rose-500/10 border border-rose-500/25 px-4 py-2.5 rounded-xl animate-scale-in">
-                    <AlertCircle size={14} className="shrink-0" />
-                    {error}
-                  </div>
-                )}
+                <p className="ux-hint mt-2 text-center">You’ll get a code to send to friends</p>
               </div>
+
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-px bg-[#523838]" />
+                <span className="text-xs font-bold text-gray-500">or</span>
+                <div className="flex-1 h-px bg-[#523838]" />
+              </div>
+
+              <div>
+                <p className="ux-label mb-2">Join a friend’s room</p>
+                <form onSubmit={handleJoinRoom} className="space-y-2">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={roomIdInput}
+                      onChange={(e) => setRoomIdInput(e.target.value.toUpperCase())}
+                      placeholder="e.g. AB12CD"
+                      maxLength={6}
+                      aria-label="Room code"
+                      className="flex-1 pinterest-input px-4 py-3.5 text-sm font-bold text-center tracking-[0.25em] uppercase placeholder:tracking-normal placeholder:text-gray-500 placeholder:font-normal"
+                    />
+                    <button
+                      type="submit"
+                      disabled={roomIdInput.trim().length < 4}
+                      className="px-5 py-3.5 bg-[#452F2F] hover:bg-[#5A3E3E] border border-[#523838] text-white font-bold rounded-2xl transition-all active:scale-95 disabled:opacity-30 cursor-pointer flex items-center gap-1"
+                    >
+                      Join
+                      <ArrowRight size={16} />
+                    </button>
+                  </div>
+                  <p className="ux-hint text-center">Ask your friend for their 4–6 letter code</p>
+                </form>
+              </div>
+
+              {error && (
+                <div className="flex items-start gap-2 text-xs text-rose-200 bg-rose-500/15 border border-rose-500/30 px-4 py-3 rounded-xl">
+                  <AlertCircle size={16} className="shrink-0 mt-0.5" />
+                  <span className="font-medium">{error}</span>
+                </div>
+              )}
             </div>
           </div>
 
-          <div className={`w-full max-w-3xl mt-10 sm:mt-14 transition-all duration-700 delay-300 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-            <p className="text-center text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4">Everything you need</p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div className={`w-full max-w-2xl mt-10 transition-all duration-700 delay-200 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
+            <p className="ux-label text-center mb-4">What you can do inside</p>
+            <div className="grid grid-cols-2 gap-3">
               {features.map((feat) => {
                 const Icon = feat.icon;
                 return (
-                  <div
-                    key={feat.title}
-                    className="pinterest-card rounded-2xl p-4 hover:bg-[#5A3E3E]/30 transition-all duration-200 hover:-translate-y-0.5"
-                  >
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center mb-3"
-                      style={{ backgroundColor: `${feat.color}18` }}
-                    >
-                      <Icon size={18} style={{ color: feat.color }} />
-                    </div>
-                    <h3 className="text-sm font-bold text-gray-100 mb-1">{feat.title}</h3>
-                    <p className="text-[11px] text-gray-400 font-medium leading-relaxed">{feat.desc}</p>
+                  <div key={feat.title} className="pinterest-card rounded-2xl p-4">
+                    <Icon size={20} className="text-[#C73543] mb-2" />
+                    <h3 className="text-sm font-bold text-white mb-1">{feat.title}</h3>
+                    <p className="ux-hint">{feat.desc}</p>
                   </div>
                 );
               })}
@@ -183,10 +207,8 @@ export const Home = () => {
           </div>
         </main>
 
-        <footer className="w-full py-6 shrink-0 select-none text-center border-t border-[#523838]/40">
-          <p className="text-[10px] text-gray-500 font-bold tracking-wider uppercase">
-            Zero friction · Real-time sync · WebSockets
-          </p>
+        <footer className="py-6 text-center">
+          <p className="ux-hint">Made by Melltros · Works on phone & desktop</p>
         </footer>
       </div>
     </div>

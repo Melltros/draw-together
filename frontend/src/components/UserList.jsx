@@ -53,8 +53,8 @@ export const UserList = ({ activeUsers = [], selfUserId, compact = false }) => {
             <Users size={14} className="text-[#C73543]" />
           </div>
           <div>
-            <h3 className="text-xs font-bold text-gray-200">Painters</h3>
-            <p className="text-[9px] text-gray-500 font-medium">{activeUsers.length} online</p>
+            <h3 className="text-xs font-bold text-gray-200">Who&apos;s here</h3>
+            <p className="text-[9px] text-gray-500 font-medium">{activeUsers.length} in this room</p>
           </div>
         </div>
         <div className="flex items-center gap-1.5 bg-emerald-500/10 px-2.5 py-1 rounded-full">

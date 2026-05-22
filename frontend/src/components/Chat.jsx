@@ -47,8 +47,10 @@ export const Chat = ({ chatMessages = [], sendMessage, fillHeight = false }) => 
             <MessageSquare size={14} className="text-[#C73543]" />
           </div>
           <div>
-            <h3 className="text-xs font-bold text-gray-200">Chat</h3>
-            <p className="text-[9px] text-gray-500 font-medium">{chatMessages.length} messages</p>
+            <h3 className="text-xs font-bold text-gray-200">Group chat</h3>
+            <p className="text-[9px] text-gray-500 font-medium">
+              {chatMessages.length === 0 ? 'Say hello to everyone' : `${chatMessages.length} messages`}
+            </p>
           </div>
         </div>
       </div>
@@ -62,8 +64,8 @@ export const Chat = ({ chatMessages = [], sendMessage, fillHeight = false }) => 
             <div className="w-12 h-12 rounded-2xl bg-dark-card flex items-center justify-center mb-3">
               <MessageSquare size={20} className="text-gray-600" />
             </div>
-            <p className="text-xs text-gray-500 font-medium">No messages yet</p>
-            <p className="text-[10px] text-gray-600 mt-1">Say hi below 👋</p>
+            <p className="text-sm text-gray-400 font-medium">No messages yet</p>
+            <p className="ux-hint mt-1">Type below — everyone in the room can see it</p>
           </div>
         ) : (
           chatMessages.map((msg, index) => {
@@ -159,7 +161,7 @@ export const Chat = ({ chatMessages = [], sendMessage, fillHeight = false }) => 
               type="text"
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder="Type a message..."
+              placeholder="Message everyone in this room…"
               maxLength={200}
               enterKeyHint="send"
               className="flex-1 min-w-0 pinterest-input px-4 py-3 text-sm text-gray-100 placeholder:text-gray-500 font-semibold rounded-xl"
