@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   Pencil, Eraser, Sparkles, Sticker, PaintBucket,
-  Palette, MessageSquare, Undo2, Redo2, Trash2, Download, ChevronUp, ChevronDown
+  Palette, MessageSquare, Undo2, Redo2, Trash2, Download
 } from 'lucide-react';
 import { ColorStrip } from './ColorStrip';
 
@@ -34,71 +34,82 @@ export const MobileDock = ({
   hasChat,
   visible
 }) => {
-  const [toolsOpen, setToolsOpen] = useState(true);
+  const dockRef = useRef(null);
+
+  useEffect(() => {
+    const el = dockRef.current;
+    if (!el || !visible) {
+      document.documentElement.style.removeProperty('--mobile-dock-height');
+      return undefined;
+    }
+
+    const syncHeight = () => {
+      document.documentElement.style.setProperty('--mobile-dock-height', `${el.offsetHeight}px`);
+    };
+
+    syncHeight();
+    const ro = new ResizeObserver(syncHeight);
+    ro.observe(el);
+    window.addEventListener('resize', syncHeight);
+
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', syncHeight);
+      document.documentElement.style.removeProperty('--mobile-dock-height');
+    };
+  }, [visible, activeTab]);
 
   if (!visible) return null;
 
   const isCanvas = activeTab === 'canvas';
-  const showDrawPanel = isCanvas && toolsOpen;
 
   return (
     <div
-      className="md:hidden fixed left-0 right-0 z-30 flex flex-col border-t border-[var(--color-border)] bg-[var(--color-surface)]/98 backdrop-blur-lg"
+      ref={dockRef}
+      className="mobile-dock md:hidden fixed left-0 right-0 z-30 flex flex-col border-t border-[var(--color-border)] bg-[var(--color-surface)]/98 backdrop-blur-lg"
       style={{ bottom: 0, paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
-      {/* Canvas-only: draw tools (collapsible) */}
+      {/* Draw tab: compact tools so canvas stays visible on small phones */}
       {isCanvas && (
         <>
-          <button
-            type="button"
-            onClick={() => setToolsOpen(!toolsOpen)}
-            className="flex items-center justify-center gap-1 py-1.5 text-[10px] font-bold text-[var(--color-text-muted)] border-b border-[var(--color-border)]/60 cursor-pointer"
-          >
-            {toolsOpen ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
-            {toolsOpen ? 'Hide draw tools' : 'Show draw tools'}
-          </button>
-
-          {showDrawPanel && (
-            <div className="px-2 pt-2 pb-1 space-y-2 border-b border-[var(--color-border)]/60 max-h-[38dvh] overflow-y-auto touch-scrollable">
-              <div className="flex gap-1">
-                {MAIN_TOOLS.map(({ id, icon: Icon, label }) => (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => setActiveTool(id)}
-                    className={`flex-1 flex flex-col items-center gap-0.5 py-2 rounded-lg text-[9px] font-bold cursor-pointer min-w-0 ${
-                      activeTool === id
-                        ? 'bg-[var(--color-primary)] text-white'
-                        : 'bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border border-[var(--color-border)]'
-                    }`}
-                  >
-                    <Icon size={16} />
-                    {label}
-                  </button>
-                ))}
-              </div>
-              <ColorStrip color={color} setColor={setColor} showHint={false} />
-              {activeTool !== 'fill' && activeTool !== 'sticker' && (
-                <div className="flex items-center gap-2 px-0.5">
-                  <span className="text-[10px] font-semibold text-[var(--color-text-muted)] w-8">Size</span>
-                  <input
-                    type="range"
-                    min="1"
-                    max="40"
-                    value={brushSize}
-                    onChange={(e) => setBrushSize(parseInt(e.target.value, 10))}
-                    className="flex-1"
-                  />
-                  <span className="text-[10px] font-bold text-white bg-[var(--color-primary)] px-2 py-0.5 rounded-md min-w-[2rem] text-center">
-                    {brushSize}
-                  </span>
-                </div>
-              )}
+          <div className="mobile-dock-tools px-2 pt-1.5 pb-1 space-y-1 border-b border-[var(--color-border)]/60">
+            <div className="flex gap-1 overflow-x-auto color-strip-scroll">
+              {MAIN_TOOLS.map(({ id, icon: Icon, label }) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => setActiveTool(id)}
+                  className={`flex flex-col items-center justify-center gap-0.5 py-1.5 px-2 rounded-lg text-[8px] font-bold cursor-pointer shrink-0 min-w-[3rem] ${
+                    activeTool === id
+                      ? 'bg-[var(--color-primary)] text-white'
+                      : 'bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border border-[var(--color-border)]'
+                  }`}
+                >
+                  <Icon size={15} />
+                  {label}
+                </button>
+              ))}
             </div>
-          )}
+            <ColorStrip color={color} setColor={setColor} size="sm" showHint={false} />
+            {activeTool !== 'fill' && activeTool !== 'sticker' && (
+              <div className="flex items-center gap-2">
+                <span className="text-[9px] font-semibold text-[var(--color-text-muted)] shrink-0">Size</span>
+                <input
+                  type="range"
+                  min="1"
+                  max="40"
+                  value={brushSize}
+                  onChange={(e) => setBrushSize(parseInt(e.target.value, 10))}
+                  className="flex-1 min-w-0 h-5"
+                />
+                <span className="text-[9px] font-bold text-white bg-[var(--color-primary)] px-1.5 py-0.5 rounded min-w-[1.75rem] text-center shrink-0">
+                  {brushSize}
+                </span>
+              </div>
+            )}
+          </div>
 
-          {/* Actions — always visible on canvas, never overlaps nav */}
-          <div className="flex gap-1.5 px-2 py-2">
+          <div className="flex gap-1 px-2 py-1.5">
             {[
               { label: 'Undo', icon: Undo2, onClick: onUndo, disabled: !canUndo },
               { label: 'Redo', icon: Redo2, onClick: onRedo, disabled: !canRedo },
@@ -110,7 +121,7 @@ export const MobileDock = ({
                 type="button"
                 onClick={onClick}
                 disabled={disabled}
-                className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2 rounded-lg text-[10px] font-bold min-h-[44px] active:scale-95 cursor-pointer disabled:opacity-35 ${
+                className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-1.5 rounded-lg text-[9px] font-bold min-h-[40px] active:scale-95 cursor-pointer disabled:opacity-35 ${
                   primary
                     ? 'bg-[var(--color-primary)] text-white'
                     : warn
@@ -118,7 +129,7 @@ export const MobileDock = ({
                       : 'bg-[var(--color-surface-2)] text-[var(--color-text)] border border-[var(--color-border)]'
                 }`}
               >
-                <Icon size={17} />
+                <Icon size={16} />
                 {label}
               </button>
             ))}
@@ -126,42 +137,41 @@ export const MobileDock = ({
         </>
       )}
 
-      {/* Main tabs */}
-      <nav className="flex items-stretch gap-1 px-2 py-2" aria-label="Main menu">
+      <nav className="flex items-stretch gap-1 px-2 py-1.5" aria-label="Main menu">
         <button
           type="button"
           onClick={() => onTabChange('tools')}
-          className={`flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl cursor-pointer ${
+          className={`flex-1 flex flex-col items-center gap-0.5 py-1.5 rounded-xl cursor-pointer ${
             activeTab === 'tools' ? 'bg-[var(--color-primary)] text-white' : 'text-[var(--color-text-muted)]'
           }`}
         >
-          <Palette size={20} />
-          <span className="text-[11px] font-bold">All tools</span>
+          <Palette size={18} />
+          <span className="text-[10px] font-bold">All tools</span>
         </button>
         <button
           type="button"
           onClick={() => onTabChange('canvas')}
-          className={`flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl cursor-pointer ${
+          className={`flex-1 flex flex-col items-center gap-0.5 py-1.5 rounded-xl cursor-pointer ${
             activeTab === 'canvas' ? 'bg-[var(--color-primary)] text-white' : 'text-[var(--color-text-muted)]'
           }`}
         >
-          <Pencil size={20} />
-          <span className="text-[11px] font-bold">Draw</span>
+          <Pencil size={18} />
+          <span className="text-[10px] font-bold">Draw</span>
           {activeTab === 'canvas' && (
-            <span className="text-[9px] opacity-80">{isConnected ? roomId : '…'}</span>
+            <span className="text-[8px] opacity-80 leading-none">{isConnected ? roomId : '…'}</span>
           )}
         </button>
         <button
           type="button"
           onClick={() => onTabChange('chat')}
-          className={`flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl cursor-pointer relative ${
+          className={`flex-1 flex flex-col items-center gap-0.5 py-1.5 rounded-xl cursor-pointer relative ${
             activeTab === 'chat' ? 'bg-[var(--color-primary)] text-white' : 'text-[var(--color-text-muted)]'
           }`}
         >
-          <MessageSquare size={20} />
-          <span className="text-[11px] font-bold">Chat</span>
+          <MessageSquare size={18} />
+          <span className="text-[10px] font-bold">Chat</span>
           {hasChat && activeTab !== 'chat' && (
-            <span className="absolute top-2 right-[22%] w-2 h-2 rounded-full bg-[var(--color-accent-soft)]" />
+            <span className="absolute top-1.5 right-[22%] w-2 h-2 rounded-full bg-[var(--color-accent-soft)]" />
           )}
         </button>
       </nav>

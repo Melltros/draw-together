@@ -46,7 +46,7 @@ export const Room = () => {
 
   // Drawing config states
   const [activeTool, setActiveTool] = useState('pen'); // 'pen', 'eraser', 'line', 'rect', 'circle', 'text'
-  const [color, setColor] = useState('#70000E');
+  const [color, setColor] = useState('#A78BFA');
   const [brushSize, setBrushSize] = useState(5);
   const [stickerSize, setStickerSize] = useState(64);
   const [selectedSticker, setSelectedSticker] = useState(null);
@@ -395,7 +395,7 @@ export const Room = () => {
       </div>
 
       {/* 2. MAIN DASHBOARD CONTENT AREA */}
-      <div className="flex-1 flex overflow-hidden min-h-0 relative p-1.5 md:p-4 gap-2 md:gap-4 max-md:pb-[calc(10.5rem+env(safe-area-inset-bottom,0px))] md:pb-4">
+      <div className="flex-1 flex overflow-hidden min-h-0 relative p-1.5 md:p-4 gap-2 md:gap-4 max-md:pb-[calc(var(--mobile-dock-height,11rem)+env(safe-area-inset-bottom,0px))] md:pb-4">
         {/* Desktop: left toolbar */}
         <div className="hidden md:flex flex-col shrink-0 gap-3 select-none">
           <Toolbar
@@ -413,7 +413,7 @@ export const Room = () => {
         </div>
 
         {/* MIDDLE WORKSPACE (Main painting canvas overlay) */}
-        <div className="flex-1 min-h-0 min-w-0 relative flex flex-col gap-2 md:gap-4">
+        <div className="flex-1 min-h-0 min-w-0 relative flex flex-col gap-2 md:gap-4 max-md:min-h-[42dvh]">
           <Canvas
             strokes={strokes}
             setStrokes={setStrokes}

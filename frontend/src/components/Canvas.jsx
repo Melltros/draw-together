@@ -142,6 +142,14 @@ export const Canvas = ({
   }, [redrawCanvas]);
 
   useEffect(() => {
+    const host = containerRef.current;
+    if (!host) return undefined;
+    const ro = new ResizeObserver(() => redrawCanvasRef.current());
+    ro.observe(host);
+    return () => ro.disconnect();
+  }, []);
+
+  useEffect(() => {
     window.handleRemoteDraw = (drawData) => {
       if (!drawData) return;
       const { type, stroke, userId: senderId } = drawData;

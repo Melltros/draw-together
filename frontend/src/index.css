@@ -32,6 +32,7 @@
   --color-text-muted: #a1a1aa;
   --color-canvas-bg: #121216;
   --mobile-dock-base: 4.25rem;
+  --mobile-dock-height: 11rem;
 }
 
 @layer utilities {
@@ -58,8 +59,8 @@
 
   .canvas-square {
     position: relative;
-    width: min(100cqw, 100cqh);
-    height: min(100cqw, 100cqh);
+    width: min(100cqw, 100cqh, 100%);
+    height: min(100cqw, 100cqh, 100%);
     max-width: 100%;
     max-height: 100%;
     flex-shrink: 0;
@@ -67,6 +68,19 @@
     border-radius: 1rem;
     overflow: hidden;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+    outline: 1px solid color-mix(in srgb, var(--color-primary) 25%, transparent);
+  }
+
+  @media (max-width: 767px) {
+    .canvas-stage-host {
+      min-height: max(38dvh, 180px);
+    }
+
+    .canvas-square {
+      /* Fallback when container height is tiny on some Android browsers */
+      width: min(100cqw, 100cqh, 100vw - 1rem, calc(100dvh - var(--mobile-dock-height, 11rem) - 5rem));
+      height: min(100cqw, 100cqh, 100vw - 1rem, calc(100dvh - var(--mobile-dock-height, 11rem) - 5rem));
+    }
   }
 
   .pinterest-panel {
@@ -299,7 +313,7 @@ body.room-mode {
   left: 0;
   right: 0;
   top: 3.5rem;
-  bottom: calc(var(--mobile-dock-base) + env(safe-area-inset-bottom, 0px));
+  bottom: calc(var(--mobile-dock-height, var(--mobile-dock-base)) + env(safe-area-inset-bottom, 0px));
   z-index: 40;
   display: flex;
   flex-direction: column;
@@ -312,7 +326,7 @@ body.room-mode {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: calc(var(--mobile-dock-base) + env(safe-area-inset-bottom, 0px));
+  bottom: calc(var(--mobile-dock-height, var(--mobile-dock-base)) + env(safe-area-inset-bottom, 0px));
   z-index: 40;
   max-height: min(75dvh, 560px);
   display: flex;
