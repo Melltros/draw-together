@@ -71,7 +71,7 @@ export const Home = () => {
         <div className="absolute top-1/3 -left-20 w-56 h-56 rounded-full bg-[#F7C7CB]/8 blur-[60px]" />
       </div>
 
-      <div className="relative z-10 flex flex-col min-h-dvh max-w-5xl mx-auto w-full px-4 sm:px-6">
+      <div className="relative z-10 flex flex-col max-w-5xl mx-auto w-full px-4 sm:px-6 pb-10">
         <header className="w-full py-5 flex justify-between items-center shrink-0 select-none">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-[#C73543]/20 border border-[#C73543]/30 flex items-center justify-center">

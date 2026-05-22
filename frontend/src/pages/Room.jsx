@@ -17,8 +17,7 @@ import {
   Globe,
   Loader2,
   Palette,
-  MessageSquare,
-  Users
+  MessageSquare
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -272,18 +271,19 @@ export const Room = () => {
 
   const mobileDrawerOpen = showLeftSidebar || showRightSidebar;
 
+  const closeMobilePanels = () => {
+    setShowLeftSidebar(false);
+    setShowRightSidebar(false);
+  };
+
   return (
     <div className="app-shell bg-[#2A1B1B] flex flex-col relative">
-      {/* Mobile sidebar backdrop */}
       {mobileDrawerOpen && (
         <button
           type="button"
           aria-label="Close panel"
-          className="fixed inset-0 z-20 bg-black/50 backdrop-blur-[2px] md:hidden cursor-pointer"
-          onClick={() => {
-            setShowLeftSidebar(false);
-            setShowRightSidebar(false);
-          }}
+          className="fixed inset-0 z-30 bg-black/60 backdrop-blur-[2px] md:hidden cursor-pointer"
+          onClick={closeMobilePanels}
         />
       )}
 
@@ -343,51 +343,13 @@ export const Room = () => {
             <span className="hidden sm:inline">{copiedLink ? 'Copied!' : 'Share'}</span>
           </button>
 
-          <button
-            onClick={() => {
-              setShowLeftSidebar(!showLeftSidebar);
-              setShowRightSidebar(false);
-            }}
-            className={`md:hidden flex items-center justify-center w-9 h-9 rounded-xl border active:scale-95 transition-all cursor-pointer ${
-              showLeftSidebar
-                ? 'bg-[#C73543] border-dark-border text-white'
-                : 'bg-dark-card border-dark-border text-gray-400 hover:text-white'
-            }`}
-            title="Toggle Drawing Tools"
-          >
-            <Palette size={15} />
-          </button>
-
-          <button
-            onClick={() => {
-              setShowRightSidebar(!showRightSidebar);
-              setShowLeftSidebar(false);
-            }}
-            className={`md:hidden flex items-center justify-center w-9 h-9 rounded-xl border active:scale-95 transition-all relative cursor-pointer ${
-              showRightSidebar
-                ? 'bg-[#C73543] border-dark-border text-white'
-                : 'bg-dark-card border-dark-border text-gray-400 hover:text-white'
-            }`}
-            title="Toggle Chat & Painters"
-          >
-            <MessageSquare size={15} />
-            {activeUsers.length > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#C73543] rounded-full text-[8px] font-bold text-white flex items-center justify-center">
-                {activeUsers.length}
-              </span>
-            )}
-          </button>
         </div>
       </header>
 
       {/* 2. MAIN DASHBOARD CONTENT AREA */}
-      <div className="flex-1 flex overflow-hidden min-h-0 relative p-1.5 md:p-4 gap-2 md:gap-4">
-        {/* LEFT WORKSPACE BAR (Drawing tools floating sidebar) */}
-        <div 
-          className={`flex-col shrink-0 gap-3 z-30 select-none absolute md:relative top-16 md:top-0 left-3 md:left-0 transition-all duration-300 sidebar-scroll md:max-h-none md:overflow-visible ${
-            showLeftSidebar ? 'flex' : 'hidden md:flex'
-          }`}
-        >
+      <div className="flex-1 flex overflow-hidden min-h-0 relative p-1.5 md:p-4 gap-2 md:gap-4 pb-[calc(3.25rem+env(safe-area-inset-bottom,0px))] md:pb-4">
+        {/* Desktop: left toolbar */}
+        <div className="hidden md:flex flex-col shrink-0 gap-3 select-none">
           <Toolbar
             activeTool={activeTool}
             setActiveTool={handleActiveToolChange}
@@ -461,25 +423,110 @@ export const Room = () => {
           </div>
         </div>
 
-        {/* RIGHT WORKSPACE BAR (User profiles list + chat panels) */}
-        <div 
-          className={`flex-col shrink-0 w-[min(100%,20rem)] md:w-80 h-full min-h-0 z-30 absolute md:relative top-14 md:top-0 right-0 md:right-0 bg-[#2A1B1B] md:bg-transparent border-l border-dark-border md:border-0 p-3 md:p-0 transition-all duration-300 overflow-hidden ${
-            showRightSidebar ? 'flex' : 'hidden md:flex'
-          }`}
-        >
-          <div className="flex md:hidden justify-between items-center mb-3 shrink-0">
-            <span className="text-xs font-bold text-gray-300">Chat & painters</span>
-            <button
-              onClick={() => setShowRightSidebar(false)}
-              className="text-xs font-bold text-[#F7C7CB] bg-[#7A0C22] border border-[#523838] px-3 py-1.5 rounded-xl active:scale-95 cursor-pointer"
-            >
-              Close Drawer
-            </button>
-          </div>
+        {/* Desktop: right sidebar */}
+        <div className="hidden md:flex flex-col shrink-0 w-80 h-full min-h-0 gap-3">
           <UserList activeUsers={activeUsers} selfUserId={userId} />
           <Chat chatMessages={chatMessages} sendMessage={sendMessage} />
         </div>
       </div>
+
+      {/* Mobile: full-screen chat — typing bar pinned to bottom */}
+      {showRightSidebar && (
+        <div className="mobile-fullsheet md:hidden" role="dialog" aria-label="Chat">
+          <div className="shrink-0 flex items-center justify-between px-4 py-3 border-b border-[#523838] bg-[#352323]">
+            <div className="flex items-center gap-2">
+              <MessageSquare size={16} className="text-[#C73543]" />
+              <span className="text-sm font-bold text-white">Chat</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowRightSidebar(false)}
+              className="text-xs font-bold text-white bg-[#7A0C22] hover:bg-[#C73543] px-4 py-2 rounded-xl active:scale-95 cursor-pointer"
+            >
+              Done
+            </button>
+          </div>
+          <UserList activeUsers={activeUsers} selfUserId={userId} compact />
+          <div className="flex-1 min-h-0 flex flex-col px-3 pt-2 pb-0">
+            <Chat chatMessages={chatMessages} sendMessage={sendMessage} fillHeight />
+          </div>
+        </div>
+      )}
+
+      {/* Mobile: tools bottom sheet */}
+      {showLeftSidebar && (
+        <div className="mobile-bottomsheet md:hidden" role="dialog" aria-label="Drawing tools">
+          <div className="shrink-0 flex flex-col items-center pt-2 pb-1">
+            <div className="w-10 h-1 rounded-full bg-[#523838] mb-2" aria-hidden />
+            <div className="w-full flex items-center justify-between px-4 pb-2">
+              <span className="text-sm font-bold text-white">Drawing tools</span>
+              <button
+                type="button"
+                onClick={() => setShowLeftSidebar(false)}
+                className="text-xs font-bold text-[#F7C7CB] bg-[#7A0C22] px-3 py-1.5 rounded-xl active:scale-95 cursor-pointer"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+          <div className="mobile-bottomsheet-scroll px-3 pb-3">
+            <Toolbar
+              activeTool={activeTool}
+              setActiveTool={handleActiveToolChange}
+              color={color}
+              setColor={setColor}
+              brushSize={brushSize}
+              setBrushSize={setBrushSize}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Mobile: bottom dock — quick access to tools & chat */}
+      <nav
+        className="md:hidden fixed left-0 right-0 bottom-0 z-20 flex items-stretch justify-around gap-1 px-2 pt-2 border-t border-[#523838] bg-[#352323]/95 backdrop-blur-md safe-bottom"
+        aria-label="Mobile actions"
+      >
+        <button
+          type="button"
+          onClick={() => {
+            setShowLeftSidebar(!showLeftSidebar);
+            setShowRightSidebar(false);
+          }}
+          className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2 rounded-xl transition-all active:scale-95 cursor-pointer ${
+            showLeftSidebar ? 'bg-[#C73543] text-white' : 'text-gray-400'
+          }`}
+        >
+          <Palette size={18} />
+          <span className="text-[10px] font-bold">Tools</span>
+        </button>
+        <button
+          type="button"
+          onClick={closeMobilePanels}
+          className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 rounded-xl text-gray-400 active:scale-95 cursor-pointer"
+        >
+          <span className="text-[10px] font-bold text-emerald-400/90 uppercase tracking-wide">
+            {isConnected ? 'Live' : '…'}
+          </span>
+          <span className="text-[9px] font-medium text-gray-500">{formattedRoomId}</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setShowRightSidebar(!showRightSidebar);
+            setShowLeftSidebar(false);
+          }}
+          className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2 rounded-xl transition-all active:scale-95 cursor-pointer relative ${
+            showRightSidebar ? 'bg-[#C73543] text-white' : 'text-gray-400'
+          }`}
+        >
+          <MessageSquare size={18} />
+          <span className="text-[10px] font-bold">Chat</span>
+          {chatMessages.length > 0 && !showRightSidebar && (
+            <span className="absolute top-1 right-[22%] w-2 h-2 bg-[#F7C7CB] rounded-full" />
+          )}
+        </button>
+      </nav>
 
       {/* 4. USERNAME OVERLAY SELECTION MODAL */}
       {showModal && (

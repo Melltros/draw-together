@@ -3,12 +3,12 @@ import { Send, MessageSquare, Smile } from 'lucide-react';
 
 const QUICK_EMOJIS = ['👍', '❤️', '🔥', '😂', '🎨', '✨'];
 
-export const Chat = ({ chatMessages = [], sendMessage }) => {
+export const Chat = ({ chatMessages = [], sendMessage, fillHeight = false }) => {
   const [text, setText] = useState('');
   const [showEmojis, setShowEmojis] = useState(false);
   const scrollRef = useRef(null);
+  const inputRef = useRef(null);
 
-  // Auto scroll to bottom when new message arrives
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -35,10 +35,13 @@ export const Chat = ({ chatMessages = [], sendMessage }) => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
+  const rootClass = fillHeight
+    ? 'h-full min-h-0 flex flex-col overflow-hidden'
+    : 'flex-1 flex flex-col min-h-0 overflow-hidden';
+
   return (
-    <div className="flex-1 flex flex-col min-h-0 pinterest-panel rounded-2xl overflow-hidden animate-slide-in-right">
-      {/* Header */}
-      <div className="px-4 py-3 border-b border-dark-border/50 flex items-center justify-between shrink-0">
+    <div className={`${rootClass} pinterest-panel rounded-2xl md:animate-slide-in-right`}>
+      <div className="px-4 py-2.5 border-b border-dark-border/50 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-[#C73543]/15 flex items-center justify-center">
             <MessageSquare size={14} className="text-[#C73543]" />
@@ -50,15 +53,17 @@ export const Chat = ({ chatMessages = [], sendMessage }) => {
         </div>
       </div>
 
-      {/* Messages */}
-      <div ref={scrollRef} className="flex-1 touch-scrollable px-3 py-3 space-y-2 min-h-0">
+      <div
+        ref={scrollRef}
+        className="flex-1 min-h-0 touch-scrollable px-3 py-3 space-y-2"
+      >
         {chatMessages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-center py-8 opacity-60">
+          <div className="flex flex-col items-center justify-center min-h-[8rem] text-center py-6 opacity-60">
             <div className="w-12 h-12 rounded-2xl bg-dark-card flex items-center justify-center mb-3">
               <MessageSquare size={20} className="text-gray-600" />
             </div>
             <p className="text-xs text-gray-500 font-medium">No messages yet</p>
-            <p className="text-[10px] text-gray-600 mt-1">Break the ice! 💬</p>
+            <p className="text-[10px] text-gray-600 mt-1">Say hi below 👋</p>
           </div>
         ) : (
           chatMessages.map((msg, index) => {
@@ -93,26 +98,19 @@ export const Chat = ({ chatMessages = [], sendMessage }) => {
             }
 
             return (
-              <div key={index} className="flex items-start gap-2 group border-0">
-                {/* Mini avatar */}
+              <div key={index} className="flex items-start gap-2 group">
                 <div
                   className="w-6 h-6 rounded-full flex items-center justify-center text-[8px] font-black text-white shrink-0 mt-0.5"
-                  style={{
-                    backgroundColor: msg.color
-                  }}
+                  style={{ backgroundColor: msg.color }}
                 >
                   {(msg.username || '?')[0].toUpperCase()}
                 </div>
-
-                {/* Message bubble */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-baseline gap-2 mb-0.5">
                     <span className="text-[10px] font-bold" style={{ color: msg.color }}>
                       {msg.username}
                     </span>
-                    <span className="text-[8px] text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                      {formatTime(msg.timestamp)}
-                    </span>
+                    <span className="text-[8px] text-gray-600">{formatTime(msg.timestamp)}</span>
                   </div>
                   <div className="bg-dark-card rounded-xl rounded-tl-sm px-3 py-2 inline-block max-w-full border border-dark-border/40">
                     <p className="text-xs text-gray-300 font-semibold break-words leading-relaxed">
@@ -126,52 +124,57 @@ export const Chat = ({ chatMessages = [], sendMessage }) => {
         )}
       </div>
 
-      {/* Quick emoji bar */}
-      {showEmojis && (
-        <div className="px-3 py-2 border-t border-dark-border/30 flex items-center gap-1.5 animate-scale-in bg-dark-bg/40">
-          {QUICK_EMOJIS.map((emoji) => (
-            <button
-              key={emoji}
-              onClick={() => handleEmojiClick(emoji)}
-              className="flex-1 flex items-center justify-center p-1.5 text-base rounded-lg bg-dark-card hover:bg-dark-hover hover:scale-115 transition-all active:scale-95 cursor-pointer"
-            >
-              {emoji}
-            </button>
-          ))}
-        </div>
-      )}
+      <div className="shrink-0 border-t border-dark-border/40 bg-[#352323] safe-bottom">
+        {showEmojis && (
+          <div className="px-3 pt-2 flex items-center gap-1.5">
+            {QUICK_EMOJIS.map((emoji) => (
+              <button
+                key={emoji}
+                type="button"
+                onClick={() => handleEmojiClick(emoji)}
+                className="flex-1 flex items-center justify-center p-2 text-lg rounded-xl bg-dark-card hover:bg-dark-hover active:scale-95 cursor-pointer"
+              >
+                {emoji}
+              </button>
+            ))}
+          </div>
+        )}
 
-      {/* Input */}
-      <form onSubmit={handleSubmit} className="px-3 py-3 border-t border-dark-border/30 shrink-0">
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setShowEmojis(!showEmojis)}
-            className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all active:scale-90 cursor-pointer ${
-              showEmojis
-                ? 'bg-[#C73543]/20 text-[#C73543]'
-                : 'bg-dark-card hover:bg-dark-hover text-gray-500 hover:text-gray-300'
-            }`}
-          >
-            <Smile size={16} />
-          </button>
-          <input
-            type="text"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Say something..."
-            maxLength={200}
-            className="flex-1 pinterest-input px-3 py-2.5 text-xs text-gray-200 placeholder:text-gray-600 outline-none transition-all font-semibold"
-          />
-          <button
-            type="submit"
-            disabled={!text.trim()}
-            className="w-9 h-9 rounded-xl bg-[#C73543] hover:bg-[#7A0C22] flex items-center justify-center text-white shrink-0 transition-all active:scale-90 disabled:opacity-30 cursor-pointer"
-          >
-            <Send size={14} />
-          </button>
-        </div>
-      </form>
+        <form onSubmit={handleSubmit} className="px-3 py-3">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShowEmojis(!showEmojis)}
+              className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 transition-all active:scale-90 cursor-pointer ${
+                showEmojis
+                  ? 'bg-[#C73543]/25 text-[#F7C7CB]'
+                  : 'bg-dark-card text-gray-400'
+              }`}
+              aria-label="Quick emojis"
+            >
+              <Smile size={18} />
+            </button>
+            <input
+              ref={inputRef}
+              type="text"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="Type a message..."
+              maxLength={200}
+              enterKeyHint="send"
+              className="flex-1 min-w-0 pinterest-input px-4 py-3 text-sm text-gray-100 placeholder:text-gray-500 font-semibold rounded-xl"
+            />
+            <button
+              type="submit"
+              disabled={!text.trim()}
+              className="w-11 h-11 rounded-xl bg-[#C73543] hover:bg-[#7A0C22] flex items-center justify-center text-white shrink-0 active:scale-90 disabled:opacity-35 cursor-pointer"
+              aria-label="Send message"
+            >
+              <Send size={16} />
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
