@@ -165,3 +165,11 @@ input[type="range"]::-webkit-slider-thumb:hover {
   pointer-events: none;
   z-index: 9999;
 }
+
+/* Touch Action Scrollable Utility to fix mobile touch scroll lockup */
+.touch-scrollable {
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  touch-action: pan-y !important;
+  overscroll-behavior-y: contain !important;
+}

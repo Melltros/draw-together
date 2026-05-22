@@ -31,10 +31,10 @@ export const Toolbar = ({
   return (
     <div className="flex flex-col gap-2 w-64 select-none animate-slide-in-right">
       {/* Tools */}
-      <div className="glass-panel rounded-2xl p-3 shadow-glow-primary">
+      <div className="pinterest-panel rounded-2xl p-3">
         <div className="flex items-center justify-between mb-2.5 px-1">
           <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Tools</span>
-          <span className="text-[9px] font-bold text-accent-cream bg-accent/15 px-1.5 py-0.5 rounded">
+          <span className="text-[9px] font-bold text-[#F7C7CB] bg-[#7A0C22] px-1.5 py-0.5 rounded">
             {tools.find(t => t.id === activeTool)?.label || 'Pen'}
           </span>
         </div>
@@ -47,10 +47,10 @@ export const Toolbar = ({
                 key={tool.id}
                 onClick={() => setActiveTool(tool.id)}
                 title={`${tool.label} (${tool.shortcut})`}
-                className={`relative flex flex-col items-center justify-center p-2.5 rounded-xl transition-all duration-200 group ${
+                className={`relative flex flex-col items-center justify-center p-2.5 rounded-xl transition-all duration-200 group border cursor-pointer ${
                   isActive
-                    ? 'bg-gradient-to-br from-accent to-accent-cream text-white shadow-lg shadow-accent/20 scale-[1.03]'
-                    : 'bg-dark-card hover:bg-dark-hover text-gray-400 hover:text-white'
+                    ? 'bg-[#C73543] border-[#7A0C22] text-white scale-[1.03]'
+                    : 'bg-dark-card border-dark-border text-gray-400 hover:text-white'
                 }`}
               >
                 <Icon size={17} className={isActive ? '' : 'group-hover:scale-110 transition-transform'} />
@@ -67,10 +67,10 @@ export const Toolbar = ({
       </div>
 
       {/* Color palette */}
-      <div className="glass-panel rounded-2xl p-3">
+      <div className="pinterest-panel rounded-2xl p-3">
         <button
           onClick={() => setShowColorPicker(!showColorPicker)}
-          className="flex items-center justify-between w-full mb-2 px-1 group"
+          className="flex items-center justify-between w-full mb-2 px-1 group cursor-pointer"
         >
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded-full ring-2 ring-white/20 shadow-lg" style={{ backgroundColor: color }} />
@@ -88,7 +88,7 @@ export const Toolbar = ({
                   <button
                     key={presetColor}
                     onClick={() => setColor(presetColor)}
-                    className={`w-full aspect-square rounded-lg transition-all duration-200 hover:scale-110 relative ${
+                    className={`w-full aspect-square rounded-lg transition-all duration-200 hover:scale-110 relative cursor-pointer ${
                       isSelected ? 'ring-2 ring-white/50 scale-110 shadow-lg' : 'hover:ring-1 ring-white/20'
                     }`}
                     style={{ backgroundColor: presetColor }}
@@ -104,7 +104,7 @@ export const Toolbar = ({
               })}
             </div>
 
-            <div className="flex items-center gap-2 bg-dark-card p-2 rounded-xl">
+            <div className="flex items-center gap-2 bg-dark-card border border-dark-border p-2 rounded-xl">
               <input
                 type="color"
                 value={color}
@@ -123,23 +123,22 @@ export const Toolbar = ({
       </div>
 
       {/* Brush size */}
-      <div className="glass-panel rounded-2xl p-3">
+      <div className="pinterest-panel rounded-2xl p-3">
         <div className="flex items-center justify-between mb-2 px-1">
           <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Size</span>
-          <span className="text-[10px] font-bold text-accent-cream bg-accent/15 px-2 py-0.5 rounded-md">
+          <span className="text-[10px] font-bold text-[#F7C7CB] bg-[#7A0C22] px-2 py-0.5 rounded-md">
             {brushSize}px
           </span>
         </div>
 
-        <div className="flex items-center gap-3 bg-dark-card p-2.5 rounded-xl">
+        <div className="flex items-center gap-3 bg-dark-card border border-dark-border p-2.5 rounded-xl">
           <div className="w-7 flex items-center justify-center shrink-0">
             <div
-              className="rounded-full transition-all duration-150 shadow-lg"
+              className="rounded-full transition-all duration-150"
               style={{
                 width: `${Math.min(brushSize, 24)}px`,
                 height: `${Math.min(brushSize, 24)}px`,
-                backgroundColor: activeTool === 'eraser' ? '#ffffff' : color,
-                boxShadow: `0 0 8px ${activeTool === 'eraser' ? 'rgba(255,255,255,0.3)' : color}40`
+                backgroundColor: activeTool === 'eraser' ? '#ffffff' : color
               }}
             />
           </div>
@@ -149,19 +148,19 @@ export const Toolbar = ({
             max="40"
             value={brushSize}
             onChange={(e) => setBrushSize(parseInt(e.target.value))}
-            className="flex-1"
+            className="flex-1 cursor-pointer"
           />
         </div>
       </div>
 
       {/* Emoji stamps */}
-      <div className="glass-panel rounded-2xl p-3">
+      <div className="pinterest-panel rounded-2xl p-3">
         <button
           onClick={() => setShowEmojis(!showEmojis)}
-          className="flex items-center justify-between w-full px-1 group"
+          className="flex items-center justify-between w-full px-1 group cursor-pointer"
         >
           <div className="flex items-center gap-2">
-            <Smile size={14} className="text-accent-cream" />
+            <Smile size={14} className="text-[#F7C7CB]" />
             <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Stickers</span>
           </div>
           {showEmojis ? <ChevronUp size={12} className="text-gray-500" /> : <ChevronDown size={12} className="text-gray-500" />}
@@ -176,7 +175,7 @@ export const Toolbar = ({
                   setActiveTool('text');
                   window.selectedEmoji = emoji;
                 }}
-                className="flex items-center justify-center p-2 text-lg rounded-lg bg-dark-card hover:bg-dark-hover hover:scale-110 transition-all duration-150 active:scale-95 cursor-pointer"
+                className="flex items-center justify-center p-2 text-lg rounded-lg bg-dark-card border border-dark-border hover:bg-dark-hover hover:scale-110 transition-all duration-150 active:scale-95 cursor-pointer"
               >
                 {emoji}
               </button>

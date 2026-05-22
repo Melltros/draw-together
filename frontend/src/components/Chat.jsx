@@ -51,7 +51,7 @@ export const Chat = ({ chatMessages = [], sendMessage }) => {
       </div>
 
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 py-3 space-y-2 min-h-0">
+      <div ref={scrollRef} className="flex-1 touch-scrollable px-3 py-3 space-y-2 min-h-0">
         {chatMessages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center py-8 opacity-60">
             <div className="w-12 h-12 rounded-2xl bg-dark-card flex items-center justify-center mb-3">

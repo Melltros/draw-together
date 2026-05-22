@@ -22,7 +22,7 @@ export const UserList = ({ activeUsers = [], selfUserId }) => {
       </div>
 
       {/* User list */}
-      <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+      <div className="space-y-1.5 max-h-40 touch-scrollable pr-1">
         {activeUsers.length === 0 ? (
           <div className="text-center py-4">
             <p className="text-xs text-gray-500 font-medium">Waiting for painters...</p>

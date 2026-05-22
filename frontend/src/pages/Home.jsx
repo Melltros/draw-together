@@ -65,7 +65,7 @@ export const Home = () => {
   ];
 
   return (
-    <div className="min-h-screen w-screen bg-[#2A1B1B] relative overflow-hidden flex flex-col justify-between">
+    <div className="min-h-screen w-screen bg-[#2A1B1B] relative touch-scrollable flex flex-col justify-between">
       {/* Top Header / Brand Badge */}
       <header className="w-full py-5 px-6 flex justify-between items-center z-10 select-none">
         <div className="flex items-center gap-2">
