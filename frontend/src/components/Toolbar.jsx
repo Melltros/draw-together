@@ -1,12 +1,12 @@
-import React from 'react';
-import { Pencil, Eraser, Minus, Square, Circle, Type, Palette } from 'lucide-react';
+import React, { useState } from 'react';
+import { Pencil, Eraser, Minus, Square, Circle, Type, Palette, Smile, ChevronDown, ChevronUp } from 'lucide-react';
 
 const PRESET_COLORS = [
-  '#FF4D4D', '#FF9F43', '#FECA57', '#1DD1A1', '#00D2D3',
-  '#54A0FF', '#5F27CD', '#FF9FF3', '#48DBFB', '#FFFFFF'
+  '#7C3AED', '#EC4899', '#3B82F6', '#06B6D4', '#10B981',
+  '#84CC16', '#F59E0B', '#EF4444', '#F97316', '#FFFFFF'
 ];
 
-const BRUSH_SIZES = [2, 5, 8, 12, 18, 24];
+const EMOJI_STAMPS = ['⭐', '❤️', '🔥', '✨', '💀', '👀', '🎨', '💜', '🌈', '😎', '🦋', '🍄'];
 
 export const Toolbar = ({
   activeTool,
@@ -16,23 +16,29 @@ export const Toolbar = ({
   brushSize,
   setBrushSize
 }) => {
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  const [showEmojis, setShowEmojis] = useState(false);
+
   const tools = [
-    { id: 'pen', icon: Pencil, label: 'Pen' },
-    { id: 'eraser', icon: Eraser, label: 'Eraser' },
-    { id: 'line', icon: Minus, label: 'Line' },
-    { id: 'rect', icon: Square, label: 'Rectangle' },
-    { id: 'circle', icon: Circle, label: 'Circle' },
-    { id: 'text', icon: Type, label: 'Text' }
+    { id: 'pen', icon: Pencil, label: 'Pen', shortcut: 'P' },
+    { id: 'eraser', icon: Eraser, label: 'Eraser', shortcut: 'E' },
+    { id: 'line', icon: Minus, label: 'Line', shortcut: 'L' },
+    { id: 'rect', icon: Square, label: 'Rect', shortcut: 'R' },
+    { id: 'circle', icon: Circle, label: 'Circle', shortcut: 'C' },
+    { id: 'text', icon: Type, label: 'Text', shortcut: 'T' },
   ];
 
   return (
-    <div className="flex flex-col gap-5 w-72 glass-panel p-5 rounded-2xl shadow-glow-primary border-dark-border select-none">
-      {/* Drawing Tools Section */}
-      <div>
-        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-          Drawing Tools
-        </h3>
-        <div className="grid grid-cols-3 gap-2">
+    <div className="flex flex-col gap-2 w-64 select-none animate-slide-in-right">
+      {/* Tools */}
+      <div className="glass-panel rounded-2xl p-3 shadow-glow-primary">
+        <div className="flex items-center justify-between mb-2.5 px-1">
+          <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Tools</span>
+          <span className="text-[9px] font-bold text-purple-400/60 bg-purple-500/10 px-1.5 py-0.5 rounded">
+            {tools.find(t => t.id === activeTool)?.label || 'Pen'}
+          </span>
+        </div>
+        <div className="grid grid-cols-3 gap-1.5">
           {tools.map((tool) => {
             const Icon = tool.icon;
             const isActive = activeTool === tool.id;
@@ -40,114 +46,144 @@ export const Toolbar = ({
               <button
                 key={tool.id}
                 onClick={() => setActiveTool(tool.id)}
-                title={tool.label}
-                className={`flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-200 ${
+                title={`${tool.label} (${tool.shortcut})`}
+                className={`relative flex flex-col items-center justify-center p-2.5 rounded-xl transition-all duration-200 group ${
                   isActive
-                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20 scale-105'
-                    : 'bg-dark-card hover:bg-dark-hover text-gray-300'
+                    ? 'bg-gradient-to-br from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/20 scale-[1.03]'
+                    : 'bg-dark-card hover:bg-dark-hover text-gray-400 hover:text-white'
                 }`}
               >
-                <Icon size={20} className={isActive ? 'animate-pulse' : ''} />
-                <span className="text-[10px] mt-1 font-medium">{tool.label}</span>
+                <Icon size={17} className={isActive ? '' : 'group-hover:scale-110 transition-transform'} />
+                <span className="text-[9px] mt-1 font-semibold">{tool.label}</span>
+                {!isActive && (
+                  <span className="absolute top-1 right-1.5 text-[8px] font-bold text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {tool.shortcut}
+                  </span>
+                )}
               </button>
             );
           })}
         </div>
       </div>
 
-      <hr className="border-dark-border" />
-
-      {/* Palette / Color Picker Section */}
-      <div>
-        <div className="flex justify-between items-center mb-3">
-          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-            Color Palette
-          </h3>
-          <div className="flex items-center gap-1.5 bg-dark-card px-2 py-0.5 rounded-md text-[10px] text-gray-300 font-medium">
-            <Palette size={10} />
-            Active
+      {/* Color palette */}
+      <div className="glass-panel rounded-2xl p-3">
+        <button
+          onClick={() => setShowColorPicker(!showColorPicker)}
+          className="flex items-center justify-between w-full mb-2 px-1 group"
+        >
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded-full ring-2 ring-white/20 shadow-lg" style={{ backgroundColor: color }} />
+            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Color</span>
           </div>
-        </div>
+          {showColorPicker ? <ChevronUp size={12} className="text-gray-500" /> : <ChevronDown size={12} className="text-gray-500" />}
+        </button>
 
-        {/* Preset Colors Grid */}
-        <div className="grid grid-cols-5 gap-2 mb-3">
-          {PRESET_COLORS.map((presetColor) => {
-            const isSelected = color.toLowerCase() === presetColor.toLowerCase();
-            return (
-              <button
-                key={presetColor}
-                onClick={() => setColor(presetColor)}
-                className={`w-8 h-8 rounded-full transition-all duration-200 hover:scale-110 relative ${
-                  isSelected ? 'ring-2 ring-indigo-500 ring-offset-2 ring-offset-dark-sidebar scale-105' : ''
-                }`}
-                style={{ backgroundColor: presetColor }}
-                title={presetColor}
+        {showColorPicker && (
+          <div className="space-y-2.5 animate-scale-in">
+            <div className="grid grid-cols-5 gap-1.5">
+              {PRESET_COLORS.map((presetColor) => {
+                const isSelected = color.toLowerCase() === presetColor.toLowerCase();
+                return (
+                  <button
+                    key={presetColor}
+                    onClick={() => setColor(presetColor)}
+                    className={`w-full aspect-square rounded-lg transition-all duration-200 hover:scale-110 relative ${
+                      isSelected ? 'ring-2 ring-white/50 scale-110 shadow-lg' : 'hover:ring-1 ring-white/20'
+                    }`}
+                    style={{ backgroundColor: presetColor }}
+                    title={presetColor}
+                  >
+                    {isSelected && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-2 h-2 rounded-full bg-dark-bg/60" />
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="flex items-center gap-2 bg-dark-card p-2 rounded-xl">
+              <input
+                type="color"
+                value={color}
+                onChange={(e) => setColor(e.target.value)}
+                className="w-7 h-7 rounded-lg bg-transparent border-0 cursor-pointer overflow-hidden"
               />
-            );
-          })}
-        </div>
-
-        {/* Custom Color Selector */}
-        <div className="flex items-center gap-2 bg-dark-card p-2 rounded-xl border border-dark-border/40">
-          <input
-            type="color"
-            value={color}
-            onChange={(e) => setColor(e.target.value)}
-            className="w-8 h-8 rounded-lg bg-transparent border-0 cursor-pointer overflow-hidden"
-          />
-          <div className="flex flex-col">
-            <span className="text-[10px] text-gray-400 font-medium">Custom Color</span>
-            <input
-              type="text"
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
-              className="text-xs font-semibold bg-transparent text-gray-100 outline-none w-20"
-            />
+              <input
+                type="text"
+                value={color}
+                onChange={(e) => setColor(e.target.value)}
+                className="flex-1 text-[11px] font-mono font-bold bg-transparent text-gray-300 outline-none uppercase"
+              />
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
-      <hr className="border-dark-border" />
-
-      {/* Brush Size Slider */}
-      <div>
-        <div className="flex justify-between items-center mb-2">
-          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-            Stroke Weight
-          </h3>
-          <span className="text-xs bg-dark-card px-2 py-0.5 rounded-md text-indigo-400 font-bold">
+      {/* Brush size */}
+      <div className="glass-panel rounded-2xl p-3">
+        <div className="flex items-center justify-between mb-2 px-1">
+          <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Size</span>
+          <span className="text-[10px] font-bold text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded-md">
             {brushSize}px
           </span>
         </div>
 
-        <div className="flex items-center gap-3 bg-dark-card p-3 rounded-xl border border-dark-border/40">
-          {/* Visual brush weight circle preview */}
-          <div className="w-8 flex items-center justify-center">
+        <div className="flex items-center gap-3 bg-dark-card p-2.5 rounded-xl">
+          <div className="w-7 flex items-center justify-center shrink-0">
             <div
-              className="bg-indigo-500 rounded-full transition-all duration-100"
+              className="rounded-full transition-all duration-150 shadow-lg"
               style={{
-                width: `${Math.min(brushSize, 28)}px`,
-                height: `${Math.min(brushSize, 28)}px`,
-                backgroundColor: activeTool === 'eraser' ? '#ffffff' : color
+                width: `${Math.min(brushSize, 24)}px`,
+                height: `${Math.min(brushSize, 24)}px`,
+                backgroundColor: activeTool === 'eraser' ? '#ffffff' : color,
+                boxShadow: `0 0 8px ${activeTool === 'eraser' ? 'rgba(255,255,255,0.3)' : color}40`
               }}
             />
           </div>
-
-          <div className="flex-1 flex flex-col gap-1.5">
-            <input
-              type="range"
-              min="1"
-              max="40"
-              value={brushSize}
-              onChange={(e) => setBrushSize(parseInt(e.target.value))}
-              className="w-full"
-            />
-            <div className="flex justify-between text-[9px] text-gray-500 font-bold px-0.5">
-              <span>Thin</span>
-              <span>Thick</span>
-            </div>
-          </div>
+          <input
+            type="range"
+            min="1"
+            max="40"
+            value={brushSize}
+            onChange={(e) => setBrushSize(parseInt(e.target.value))}
+            className="flex-1"
+          />
         </div>
+      </div>
+
+      {/* Emoji stamps */}
+      <div className="glass-panel rounded-2xl p-3">
+        <button
+          onClick={() => setShowEmojis(!showEmojis)}
+          className="flex items-center justify-between w-full px-1 group"
+        >
+          <div className="flex items-center gap-2">
+            <Smile size={14} className="text-yellow-400" />
+            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Stickers</span>
+          </div>
+          {showEmojis ? <ChevronUp size={12} className="text-gray-500" /> : <ChevronDown size={12} className="text-gray-500" />}
+        </button>
+
+        {showEmojis && (
+          <div className="grid grid-cols-6 gap-1.5 mt-2.5 animate-scale-in">
+            {EMOJI_STAMPS.map((emoji) => (
+              <button
+                key={emoji}
+                onClick={() => {
+                  setActiveTool('text');
+                  // Store selected emoji in a custom event for Canvas to pick up
+                  window.selectedEmoji = emoji;
+                }}
+                className="flex items-center justify-center p-2 text-lg rounded-lg bg-dark-card hover:bg-dark-hover hover:scale-110 transition-all duration-150 active:scale-95"
+              >
+                {emoji}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

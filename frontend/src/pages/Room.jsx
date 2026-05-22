@@ -43,7 +43,7 @@ export const Room = () => {
 
   // Drawing config states
   const [activeTool, setActiveTool] = useState('pen'); // 'pen', 'eraser', 'line', 'rect', 'circle', 'text'
-  const [color, setColor] = useState('#FF4D4D');
+  const [color, setColor] = useState('#7C3AED');
   const [brushSize, setBrushSize] = useState(5);
   
   // Custom tool changer that auto-collapses left sidebar on mobile screen
@@ -238,16 +238,20 @@ export const Room = () => {
   // Render checking page if board validation is taking place
   if (roomCheckingError) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0B0B0D] text-center p-4">
-        <div className="max-w-md glass-panel p-8 rounded-3xl border border-dark-border">
-          <Globe size={48} className="mx-auto text-rose-500 mb-4 animate-pulse" />
-          <h2 className="text-xl font-bold text-gray-200 mb-2">Access Denied</h2>
-          <p className="text-sm text-gray-400 mb-6">{roomCheckingError}</p>
+      <div className="min-h-screen flex items-center justify-center bg-dark-bg text-center p-4 relative overflow-hidden">
+        <div className="absolute -top-32 -left-32 w-96 h-96 bg-rose-600/5 rounded-full blur-3xl orb-1" />
+        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-purple-600/5 rounded-full blur-3xl orb-2" />
+        <div className="relative max-w-md glass-panel p-8 rounded-3xl gradient-border animate-scale-in">
+          <div className="w-16 h-16 bg-rose-500/10 rounded-2xl flex items-center justify-center mx-auto mb-5">
+            <Globe size={28} className="text-rose-400 animate-pulse" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-100 mb-2">Board Not Found</h2>
+          <p className="text-sm text-gray-400 mb-6 font-medium">{roomCheckingError}</p>
           <button
             onClick={() => navigate('/')}
-            className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold text-sm text-white transition-all duration-200"
+            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-2xl font-bold text-sm text-white transition-all duration-200 active:scale-95 shadow-lg shadow-purple-500/20 btn-glow"
           >
-            Return to Dashboard
+            Return Home
           </button>
         </div>
       </div>
@@ -256,9 +260,18 @@ export const Room = () => {
 
   if (!roomExistsChecked) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#0B0B0D] text-center gap-3">
-        <Loader2 size={36} className="text-indigo-500 animate-spin" />
-        <span className="text-sm font-semibold text-gray-400">Verifying PaintSync Board...</span>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-dark-bg text-center gap-4 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="orb-1 absolute top-1/4 left-1/4 w-64 h-64 bg-purple-600/5 rounded-full blur-3xl" />
+          <div className="orb-2 absolute bottom-1/4 right-1/4 w-64 h-64 bg-pink-600/5 rounded-full blur-3xl" />
+        </div>
+        <div className="relative">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600/20 to-pink-600/20 flex items-center justify-center mb-4 mx-auto animate-glow">
+            <Loader2 size={28} className="text-purple-400 animate-spin" />
+          </div>
+          <span className="text-sm font-bold text-gray-300">Loading Board...</span>
+          <p className="text-[10px] text-gray-500 mt-1 font-medium">Connecting to PaintSync servers</p>
+        </div>
       </div>
     );
   }
@@ -266,9 +279,9 @@ export const Room = () => {
   return (
     <div className="min-h-screen max-h-screen w-screen bg-[#0A0A0D] flex flex-col overflow-hidden relative">
       {/* 1. TOP NAVBAR PANEL */}
-      <header className="h-14 glass-panel border-b border-dark-border px-4 sm:px-5 flex items-center justify-between shrink-0 select-none">
-        {/* Left Back Button */}
-        <div className="flex items-center gap-2 sm:gap-4">
+      <header className="h-13 glass-panel border-b border-dark-border/50 px-4 sm:px-5 flex items-center justify-between shrink-0 select-none">
+        {/* Left */}
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={() => navigate('/')}
             className="flex items-center gap-1.5 text-xs font-semibold text-gray-400 hover:text-white transition-all bg-dark-card border border-dark-border/50 hover:bg-dark-hover px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-xl active:scale-95"
@@ -277,41 +290,40 @@ export const Room = () => {
             <span className="hidden sm:inline">Exit</span>
           </button>
           
-          <div className="h-4 w-[1px] bg-dark-border" />
+          <div className="h-4 w-[1px] bg-dark-border/50" />
           
-          {/* Room details */}
           <div className="flex items-center gap-1.5">
-            <span className="hidden xs:inline text-[10px] text-gray-500 font-bold uppercase tracking-wider">BOARD</span>
-            <span className="text-xs sm:text-sm font-extrabold text-white tracking-widest bg-indigo-600/10 border border-indigo-500/20 px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-lg">
-              {formattedRoomId}
+            <span className="text-xs sm:text-sm font-extrabold tracking-widest bg-gradient-to-r from-purple-500/15 to-pink-500/15 border border-purple-500/20 px-2.5 py-0.5 rounded-lg">
+              <span className="gradient-text">{formattedRoomId}</span>
             </span>
           </div>
         </div>
 
-        {/* Center Connection Indicator */}
+        {/* Center */}
         <div className="hidden md:flex items-center gap-2">
           <div className="relative flex items-center">
             <span
-              className={`w-2.5 h-2.5 rounded-full shrink-0 ${
+              className={`w-2 h-2 rounded-full shrink-0 ${
                 isConnected ? 'bg-emerald-500' : 'bg-rose-500'
               }`}
             />
             {isConnected && (
-              <span className="absolute w-2.5 h-2.5 bg-emerald-400 rounded-full shrink-0 animate-ping opacity-75" />
+              <span className="absolute w-2 h-2 bg-emerald-400 rounded-full shrink-0 animate-ping opacity-75" />
             )}
           </div>
-          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-            {isConnected ? 'Real-time Connected' : 'Connecting Server...'}
+          <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+            {isConnected ? 'Synced' : 'Connecting...'}
           </span>
         </div>
 
-        {/* Right Invite / Share button */}
-        <div className="flex items-center gap-2">
+        {/* Right */}
+        <div className="flex items-center gap-1.5">
           {username && (
-            <div className="hidden sm:flex items-center gap-2 bg-dark-card/50 border border-dark-border/50 rounded-xl py-1 px-2.5">
-              <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">You:</span>
-              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: userColor }} />
-              <span className="text-xs font-semibold text-gray-300 truncate max-w-[80px]">
+            <div className="hidden sm:flex items-center gap-2 bg-dark-card/50 border border-dark-border/40 rounded-xl py-1 px-2.5">
+              <div className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-black text-white" style={{ backgroundColor: userColor }}>
+                {(username || '?')[0].toUpperCase()}
+              </div>
+              <span className="text-[11px] font-semibold text-gray-300 truncate max-w-[70px]">
                 {username}
               </span>
             </div>
@@ -319,22 +331,25 @@ export const Room = () => {
 
           <button
             onClick={handleCopyLink}
-            className="flex items-center gap-1.5 text-xs font-semibold text-indigo-400 bg-indigo-500/10 border border-indigo-500/25 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-xl hover:bg-indigo-500/20 transition-all hover:scale-105 active:scale-95"
+            className="flex items-center gap-1.5 text-xs font-semibold text-purple-400 bg-purple-500/10 border border-purple-500/20 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-xl hover:bg-purple-500/20 transition-all active:scale-95"
           >
             {copiedLink ? <Check size={13} className="animate-bounce" /> : <Copy size={13} />}
-            <span className="hidden xs:inline">{copiedLink ? 'Copied URL!' : 'Share'}</span>
+            <span className="hidden sm:inline">{copiedLink ? 'Copied!' : 'Share'}</span>
           </button>
 
-          {/* Mobile responsive sidebar togglers */}
           <button
             onClick={() => {
               setShowLeftSidebar(!showLeftSidebar);
               setShowRightSidebar(false);
             }}
-            className="md:hidden flex items-center justify-center w-9 h-9 rounded-xl bg-dark-card hover:bg-dark-hover border border-dark-border/50 text-indigo-400 active:scale-95"
+            className={`md:hidden flex items-center justify-center w-9 h-9 rounded-xl border active:scale-95 transition-all ${
+              showLeftSidebar
+                ? 'bg-purple-500/20 border-purple-500/30 text-purple-400'
+                : 'bg-dark-card border-dark-border/50 text-gray-400 hover:text-purple-400'
+            }`}
             title="Toggle Drawing Tools"
           >
-            <Palette size={16} />
+            <Palette size={15} />
           </button>
 
           <button
@@ -342,12 +357,16 @@ export const Room = () => {
               setShowRightSidebar(!showRightSidebar);
               setShowLeftSidebar(false);
             }}
-            className="md:hidden flex items-center justify-center w-9 h-9 rounded-xl bg-dark-card hover:bg-dark-hover border border-dark-border/50 text-indigo-400 active:scale-95 relative"
+            className={`md:hidden flex items-center justify-center w-9 h-9 rounded-xl border active:scale-95 transition-all relative ${
+              showRightSidebar
+                ? 'bg-purple-500/20 border-purple-500/30 text-purple-400'
+                : 'bg-dark-card border-dark-border/50 text-gray-400 hover:text-purple-400'
+            }`}
             title="Toggle Chat & Painters"
           >
-            <MessageSquare size={16} />
+            <MessageSquare size={15} />
             {activeUsers.length > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-indigo-600 rounded-full text-[9px] font-bold text-white flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full text-[8px] font-bold text-white flex items-center justify-center shadow-lg">
                 {activeUsers.length}
               </span>
             )}
@@ -393,56 +412,46 @@ export const Room = () => {
           />
 
           {/* 3. BOTTOM PANEL ACTIONS */}
-          <div className="h-14 glass-panel rounded-2xl flex items-center justify-between px-4 sm:px-5 select-none shrink-0 border border-dark-border shadow-glow-primary">
-            {/* Undo / Redo buttons */}
-            <div className="flex items-center gap-2">
+          <div className="h-12 glass-panel rounded-2xl flex items-center justify-between px-3 sm:px-4 select-none shrink-0 border border-dark-border/50">
+            <div className="flex items-center gap-1.5">
               <button
                 onClick={handleLocalUndo}
                 disabled={undoStack.length === 0}
                 title="Undo (Ctrl+Z)"
-                className="flex items-center gap-1 px-2.5 py-1.5 sm:gap-1.5 sm:px-3.5 sm:py-2 bg-dark-card hover:bg-dark-hover border border-dark-border disabled:opacity-40 disabled:scale-100 disabled:bg-dark-card text-gray-300 rounded-xl transition-all duration-150 text-xs font-bold active:scale-95 shrink-0"
+                className="flex items-center gap-1 px-2.5 py-1.5 sm:px-3 sm:py-1.5 bg-dark-card hover:bg-dark-hover border border-dark-border/50 disabled:opacity-30 text-gray-400 hover:text-white rounded-xl transition-all text-[11px] font-bold active:scale-95 shrink-0"
               >
-                <Undo2 size={14} />
+                <Undo2 size={13} />
                 <span className="hidden sm:inline">Undo</span>
-                <span className="text-[9px] font-bold text-gray-600 bg-black/25 px-1.5 py-0.5 rounded-md">
-                  {undoStack.length}
-                </span>
+                <span className="text-[8px] font-bold text-purple-400/60 bg-purple-500/10 px-1 py-0.5 rounded">{undoStack.length}</span>
               </button>
-
               <button
                 onClick={handleLocalRedo}
                 disabled={redoStack.length === 0}
                 title="Redo (Ctrl+Y)"
-                className="flex items-center gap-1 px-2.5 py-1.5 sm:gap-1.5 sm:px-3.5 sm:py-2 bg-dark-card hover:bg-dark-hover border border-dark-border disabled:opacity-40 disabled:scale-100 disabled:bg-dark-card text-gray-300 rounded-xl transition-all duration-150 text-xs font-bold active:scale-95 shrink-0"
+                className="flex items-center gap-1 px-2.5 py-1.5 sm:px-3 sm:py-1.5 bg-dark-card hover:bg-dark-hover border border-dark-border/50 disabled:opacity-30 text-gray-400 hover:text-white rounded-xl transition-all text-[11px] font-bold active:scale-95 shrink-0"
               >
-                <Redo2 size={14} />
+                <Redo2 size={13} />
                 <span className="hidden sm:inline">Redo</span>
-                <span className="text-[9px] font-bold text-gray-600 bg-black/25 px-1.5 py-0.5 rounded-md">
-                  {redoStack.length}
-                </span>
+                <span className="text-[8px] font-bold text-purple-400/60 bg-purple-500/10 px-1 py-0.5 rounded">{redoStack.length}</span>
               </button>
             </div>
 
-            {/* Clear Board action */}
             <button
               onClick={handleLocalClear}
               disabled={strokes.length === 0}
-              className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 hover:bg-rose-500/10 border border-dark-border text-rose-400 hover:text-rose-300 rounded-xl transition-all duration-150 text-xs font-bold active:scale-95 disabled:opacity-30 disabled:scale-100 shrink-0"
+              className="flex items-center gap-1.5 px-3 py-1.5 hover:bg-rose-500/10 border border-dark-border/50 text-rose-400/80 hover:text-rose-300 rounded-xl transition-all text-[11px] font-bold active:scale-95 disabled:opacity-20 shrink-0"
             >
-              <Trash2 size={14} />
-              <span className="hidden sm:inline">Clear Canvas</span>
+              <Trash2 size={13} />
+              <span className="hidden sm:inline">Clear</span>
             </button>
 
-            {/* Download/Share Board */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleDownload}
-                className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-lg shadow-indigo-600/10 hover:shadow-indigo-600/20 transition-all duration-150 text-xs font-bold active:scale-95 shrink-0"
-              >
-                <Download size={14} />
-                <span className="hidden sm:inline">Download PNG</span>
-              </button>
-            </div>
+            <button
+              onClick={handleDownload}
+              className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-1.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-xl shadow-lg shadow-purple-600/15 hover:shadow-purple-500/25 transition-all text-[11px] font-bold active:scale-95 shrink-0 btn-glow"
+            >
+              <Download size={13} />
+              <span className="hidden sm:inline">Export</span>
+            </button>
           </div>
         </div>
 
@@ -467,15 +476,21 @@ export const Room = () => {
 
       {/* 4. USERNAME OVERLAY SELECTION MODAL */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md">
-          <div className="w-full max-w-md mx-4 glass-panel p-8 rounded-3xl border border-dark-border text-center shadow-glow-primary animate-glow">
-            <div className="w-12 h-12 bg-indigo-500/15 text-indigo-400 border border-indigo-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Palette size={20} className="animate-spin" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-xl">
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="orb-1 absolute top-1/4 left-1/4 w-48 h-48 bg-purple-600/10 rounded-full blur-3xl" />
+            <div className="orb-2 absolute bottom-1/4 right-1/4 w-48 h-48 bg-pink-600/10 rounded-full blur-3xl" />
+          </div>
+          <div className="relative w-full max-w-sm mx-4 glass-panel p-8 rounded-3xl text-center animate-scale-in gradient-border">
+            <div className="w-14 h-14 bg-gradient-to-br from-purple-500/20 to-pink-500/20 text-purple-400 rounded-2xl flex items-center justify-center mx-auto mb-5">
+              <Palette size={24} className="animate-pulse" />
             </div>
             
-            <h2 className="text-xl font-bold text-gray-100 mb-2">Who's Drawing?</h2>
-            <p className="text-xs text-gray-400 mb-6 font-medium leading-relaxed">
-              Enter your display name to join this real-time session. A custom color will be automatically assigned to you.
+            <h2 className="text-2xl font-black text-gray-100 mb-2">
+              <span className="gradient-text">Join</span> the Canvas
+            </h2>
+            <p className="text-xs text-gray-500 mb-6 font-medium leading-relaxed">
+              Pick a display name. You'll get a unique color assigned automatically.
             </p>
 
             <form onSubmit={handleModalSubmit} className="space-y-4">
@@ -486,15 +501,16 @@ export const Room = () => {
                 maxLength={16}
                 value={modalInput}
                 onChange={(e) => setModalInput(e.target.value)}
-                placeholder="Enter username"
-                className="w-full glass-input bg-dark-input hover:bg-dark-input/80 px-4 py-3 border-dark-border text-sm text-center font-bold placeholder:font-normal"
+                placeholder="Your name"
+                className="w-full glass-input bg-dark-input px-4 py-3.5 text-sm text-center font-bold tracking-wide placeholder:font-normal placeholder:tracking-normal"
               />
               <button
                 type="submit"
                 disabled={!modalInput.trim()}
-                className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-2xl shadow-xl shadow-indigo-600/10 hover:shadow-indigo-600/20 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100"
+                className="relative w-full py-3.5 text-white font-bold rounded-2xl active:scale-[0.97] transition-all disabled:opacity-40 overflow-hidden btn-glow"
               >
-                Join Studio Board
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 animate-gradient" />
+                <span className="relative">Start Drawing ✨</span>
               </button>
             </form>
           </div>

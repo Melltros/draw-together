@@ -1,59 +1,85 @@
 import React from 'react';
-import { Users, ShieldAlert } from 'lucide-react';
+import { Users, Crown, Wifi } from 'lucide-react';
 
-export const UserList = ({ activeUsers, selfUserId }) => {
+export const UserList = ({ activeUsers = [], selfUserId }) => {
   return (
-    <div className="flex flex-col h-1/2 glass-panel p-4 rounded-2xl shadow-glow-primary border-dark-border select-none overflow-hidden">
+    <div className="glass-panel rounded-2xl p-4 mb-3 shrink-0 animate-slide-in-right">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4 border-b border-dark-border/50 pb-3">
+      <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <Users size={16} className="text-indigo-400" />
-          <h3 className="text-sm font-semibold text-gray-200 tracking-wide">
-            Painters Online
-          </h3>
+          <div className="w-7 h-7 rounded-lg bg-purple-500/15 flex items-center justify-center">
+            <Users size={14} className="text-purple-400" />
+          </div>
+          <div>
+            <h3 className="text-xs font-bold text-gray-200">Painters</h3>
+            <p className="text-[9px] text-gray-500 font-medium">{activeUsers.length} online</p>
+          </div>
         </div>
-        <span className="text-xs bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded-full font-bold">
-          {activeUsers.length}
-        </span>
+        <div className="flex items-center gap-1.5 bg-emerald-500/10 px-2.5 py-1 rounded-full">
+          <Wifi size={10} className="text-emerald-400" />
+          <span className="text-[9px] font-bold text-emerald-400 uppercase">Live</span>
+        </div>
       </div>
 
-      {/* List */}
-      <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+      {/* User list */}
+      <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
         {activeUsers.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-gray-500 py-6 text-center">
-            <ShieldAlert size={24} className="mb-2 text-gray-600 animate-bounce" />
-            <p className="text-xs">No painters online</p>
+          <div className="text-center py-4">
+            <p className="text-xs text-gray-500 font-medium">Waiting for painters...</p>
           </div>
         ) : (
-          activeUsers.map((user) => {
+          activeUsers.map((user, index) => {
             const isSelf = user.userId === selfUserId;
+            const initials = (user.username || '?').slice(0, 2).toUpperCase();
             return (
               <div
                 key={user.userId}
-                className="flex items-center justify-between p-2.5 rounded-xl bg-dark-card/50 hover:bg-dark-hover/70 border border-dark-border/20 transition-all duration-200"
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
+                  isSelf
+                    ? 'bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20'
+                    : 'bg-dark-card/50 hover:bg-dark-hover/50'
+                }`}
+                style={{ animationDelay: `${index * 50}ms` }}
               >
-                <div className="flex items-center gap-3 overflow-hidden">
-                  {/* Colored User Avatar */}
+                {/* Avatar */}
+                <div className="relative">
                   <div
-                    className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-dark-bg shrink-0 shadow-inner relative"
-                    style={{ backgroundColor: user.color }}
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-black text-white shadow-lg"
+                    style={{
+                      backgroundColor: user.color,
+                      boxShadow: `0 0 12px ${user.color}30`
+                    }}
                   >
-                    {user.username.charAt(0).toUpperCase()}
-                    {/* Active pulse dot */}
-                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-dark-bg rounded-full"></span>
+                    {initials}
                   </div>
-
-                  {/* Username */}
-                  <span className="text-xs font-medium text-gray-300 truncate">
-                    {user.username}
-                  </span>
+                  {/* Online pulse */}
+                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-dark-bg">
+                    <div className="absolute inset-0 bg-emerald-400 rounded-full animate-ping opacity-75" />
+                  </div>
                 </div>
 
-                {isSelf && (
-                  <span className="text-[9px] bg-indigo-500/20 text-indigo-400 px-1.5 py-0.5 rounded-md font-bold shrink-0 border border-indigo-500/30">
-                    You
-                  </span>
-                )}
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-bold text-gray-200 truncate">
+                      {user.username}
+                    </span>
+                    {index === 0 && (
+                      <Crown size={10} className="text-yellow-400 shrink-0" />
+                    )}
+                    {isSelf && (
+                      <span className="text-[8px] font-bold text-purple-400 bg-purple-500/15 px-1.5 py-0.5 rounded-full shrink-0">
+                        You
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Color dot */}
+                <div
+                  className="w-3 h-3 rounded-full shrink-0 ring-1 ring-white/10"
+                  style={{ backgroundColor: user.color }}
+                />
               </div>
             );
           })
